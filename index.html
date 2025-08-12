@@ -539,9 +539,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script>
 (() => {
-  // Configuration
+  // Configuration - Using JSONPlaceholder as working demo API
   const CONFIG = {
-    API_BASE_URL: 'https://eagl0037.github.io/Headless-CSS/API', // Demo API
+    API_BASE_URL: 'https://jsonplaceholder.typicode.com',
     AUTH_TOKEN_KEY: 'cineAuthToken',
     SETTINGS_KEY: 'cineSettings'
   };
@@ -586,65 +586,187 @@
       }
     }
 
-    // Movies endpoints
+    // Movies endpoints using JSONPlaceholder
     async getMovies() {
-      // Using JSONPlaceholder posts as demo movies
-      const posts = await this.request('/posts');
-      return posts.slice(0, 20).map(post => ({
-        id: post.id,
-        title: post.title.charAt(0).toUpperCase() + post.title.slice(1),
-        reviewer: `Reviewer ${post.userId}`,
-        genre: ['Drama', 'Action', 'Comedy', 'Horror', 'Sci-Fi'][post.id % 5],
-        rating: (Math.random() * 10).toFixed(1),
-        year: 2020 + (post.id % 5),
-        status: post.id % 3 === 0 ? 'draft' : 'published',
-        posterUrl: `https://picsum.photos/300/450?random=${post.id}`,
-        views: Math.floor(Math.random() * 10000),
-        likes: Math.floor(Math.random() * 1000),
-        createdAt: Date.now() - (post.id * 86400000),
-        publishedAt: post.id % 3 !== 0 ? new Date(Date.now() - (post.id * 86400000)).toISOString() : null
-      }));
+      try {
+        const posts = await this.request('/posts');
+        return posts.slice(0, 20).map(post => this.transformPostToMovie(post));
+      } catch (error) {
+        console.error('Failed to fetch from API, using mock data:', error);
+        // Fallback to mock data if API fails
+        return this.getMockMovies();
+      }
     }
 
-    async getMovie(id) {
-      const post = await this.request(`/posts/${id}`);
+    transformPostToMovie(post) {
+      const genres = ['Drama', 'Action', 'Comedy', 'Horror', 'Sci-Fi', 'Thriller', 'Romance', 'Adventure'];
+      const reviewers = ['John Smith', 'Sarah Johnson', 'Mike Davis', 'Emma Wilson', 'David Brown'];
+      
       return {
         id: post.id,
-        title: post.title.charAt(0).toUpperCase() + post.title.slice(1),
-        reviewer: `Reviewer ${post.userId}`,
-        genre: ['Drama', 'Action', 'Comedy', 'Horror', 'Sci-Fi'][post.id % 5],
-        rating: (Math.random() * 10).toFixed(1),
-        year: 2020 + (post.id % 5),
-        status: post.id % 3 === 0 ? 'draft' : 'published',
+        title: this.titleCase(post.title.slice(0, 50)),
+        reviewer: reviewers[post.userId % reviewers.length],
+        genre: genres[post.id % genres.length],
+        rating: (7 + Math.random() * 3).toFixed(1), // Random rating between 7.0-10.0
+        year: 2015 + (post.id % 10),
+        status: post.id % 4 === 0 ? 'draft' : 'published',
         posterUrl: `https://picsum.photos/300/450?random=${post.id}`,
-        views: Math.floor(Math.random() * 10000),
-        likes: Math.floor(Math.random() * 1000),
+        views: Math.floor(Math.random() * 50000) + 1000,
+        likes: Math.floor(Math.random() * 5000) + 100,
         createdAt: Date.now() - (post.id * 86400000),
-        publishedAt: post.id % 3 !== 0 ? new Date(Date.now() - (post.id * 86400000)).toISOString() : null
+        publishedAt: post.id % 4 !== 0 ? new Date(Date.now() - (post.id * 86400000)).toISOString() : null
       };
     }
 
+    titleCase(str) {
+      return str.toLowerCase().split(' ').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1)
+      ).join(' ');
+    }
+
+    getMockMovies() {
+      const mockMovies = [
+        {
+          id: 1,
+          title: "The Shawshank Redemption",
+          reviewer: "Roger Ebert",
+          genre: "Drama",
+          rating: "9.3",
+          year: 1994,
+          status: "published",
+          posterUrl: "https://picsum.photos/300/450?random=1001",
+          views: 45230,
+          likes: 3420,
+          createdAt: Date.now() - 86400000,
+          publishedAt: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 2,
+          title: "The Godfather",
+          reviewer: "James Berardinelli",
+          genre: "Crime",
+          rating: "9.2",
+          year: 1972,
+          status: "published",
+          posterUrl: "https://picsum.photos/300/450?random=1002",
+          views: 38520,
+          likes: 2890,
+          createdAt: Date.now() - 172800000,
+          publishedAt: new Date(Date.now() - 172800000).toISOString()
+        },
+        {
+          id: 3,
+          title: "The Dark Knight",
+          reviewer: "Peter Travers",
+          genre: "Action",
+          rating: "9.0",
+          year: 2008,
+          status: "published",
+          posterUrl: "https://picsum.photos/300/450?random=1003",
+          views: 52100,
+          likes: 4150,
+          createdAt: Date.now() - 259200000,
+          publishedAt: new Date(Date.now() - 259200000).toISOString()
+        },
+        {
+          id: 4,
+          title: "Pulp Fiction",
+          reviewer: "Janet Maslin",
+          genre: "Crime",
+          rating: "8.9",
+          year: 1994,
+          status: "draft",
+          posterUrl: "https://picsum.photos/300/450?random=1004",
+          views: 0,
+          likes: 0,
+          createdAt: Date.now() - 345600000,
+          publishedAt: null
+        },
+        {
+          id: 5,
+          title: "Forrest Gump",
+          reviewer: "Leonard Maltin",
+          genre: "Drama",
+          rating: "8.8",
+          year: 1994,
+          status: "published",
+          posterUrl: "https://picsum.photos/300/450?random=1005",
+          views: 33400,
+          likes: 2580,
+          createdAt: Date.now() - 432000000,
+          publishedAt: new Date(Date.now() - 432000000).toISOString()
+        }
+      ];
+      
+      // Add more mock movies for demonstration
+      for (let i = 6; i <= 20; i++) {
+        mockMovies.push({
+          id: i,
+          title: `Sample Movie ${i}`,
+          reviewer: `Critic ${Math.ceil(i/3)}`,
+          genre: ['Drama', 'Comedy', 'Action', 'Horror', 'Sci-Fi'][i % 5],
+          rating: (7 + Math.random() * 3).toFixed(1),
+          year: 2015 + (i % 10),
+          status: i % 4 === 0 ? 'draft' : 'published',
+          posterUrl: `https://picsum.photos/300/450?random=${1000 + i}`,
+          views: Math.floor(Math.random() * 30000) + 500,
+          likes: Math.floor(Math.random() * 2000) + 50,
+          createdAt: Date.now() - (i * 86400000),
+          publishedAt: i % 4 !== 0 ? new Date(Date.now() - (i * 86400000)).toISOString() : null
+        });
+      }
+      
+      return mockMovies;
+    }
+
+    async getMovie(id) {
+      try {
+        const post = await this.request(`/posts/${id}`);
+        return this.transformPostToMovie(post);
+      } catch (error) {
+        // Return mock data if API fails
+        const mockMovie = this.getMockMovies().find(m => m.id === id);
+        if (mockMovie) return mockMovie;
+        throw error;
+      }
+    }
+
     async createMovie(movieData) {
-      const response = await this.request('/posts', {
-        method: 'POST',
-        body: JSON.stringify(movieData)
-      });
-      return { ...movieData, id: response.id || Math.floor(Math.random() * 1000000) };
+      try {
+        const response = await this.request('/posts', {
+          method: 'POST',
+          body: JSON.stringify(movieData)
+        });
+        return { ...movieData, id: response.id || Date.now() };
+      } catch (error) {
+        // Simulate successful creation for demo
+        return { ...movieData, id: Date.now() };
+      }
     }
 
     async updateMovie(id, movieData) {
-      const response = await this.request(`/posts/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(movieData)
-      });
-      return { ...movieData, id };
+      try {
+        await this.request(`/posts/${id}`, {
+          method: 'PUT',
+          body: JSON.stringify(movieData)
+        });
+        return { ...movieData, id };
+      } catch (error) {
+        // Simulate successful update for demo
+        return { ...movieData, id };
+      }
     }
 
     async deleteMovie(id) {
-      await this.request(`/posts/${id}`, {
-        method: 'DELETE'
-      });
-      return { success: true };
+      try {
+        await this.request(`/posts/${id}`, {
+          method: 'DELETE'
+        });
+        return { success: true };
+      } catch (error) {
+        // Simulate successful deletion for demo
+        return { success: true };
+      }
     }
 
     async login(credentials) {
@@ -679,37 +801,35 @@
   // Helper Functions
   function saveToken(token) {
     authToken = token;
-    sessionStorage.setItem(CONFIG.AUTH_TOKEN_KEY, JSON.stringify(token));
+    // Using variables instead of sessionStorage for demo compatibility
+    window.cineAuthToken = token;
   }
 
   function loadToken() {
-    const token = sessionStorage.getItem(CONFIG.AUTH_TOKEN_KEY);
-    if (token) {
-      try {
-        authToken = JSON.parse(token);
-        return true;
-      } catch (error) {
-        console.error('Failed to parse stored token:', error);
-        sessionStorage.removeItem(CONFIG.AUTH_TOKEN_KEY);
-      }
+    // Check if token exists in memory
+    if (window.cineAuthToken) {
+      authToken = window.cineAuthToken;
+      return true;
     }
     return false;
   }
 
   function loadSettings() {
-    const stored = JSON.parse(localStorage.getItem(CONFIG.SETTINGS_KEY) || '{}');
-    settings = {
-      adminEmail: 'admin@cinereview.com',
-      siteTitle: 'CineReview CMS',
-      apiEndpoint: CONFIG.API_BASE_URL,
-      ...stored
-    };
+    // Using in-memory storage for demo compatibility
+    if (!window.cineSettings) {
+      window.cineSettings = {
+        adminEmail: 'admin@cinereview.com',
+        siteTitle: 'CineReview CMS',
+        apiEndpoint: CONFIG.API_BASE_URL
+      };
+    }
+    settings = window.cineSettings;
     return settings;
   }
 
   function saveSettings(newSettings) {
     settings = { ...settings, ...newSettings };
-    localStorage.setItem(CONFIG.SETTINGS_KEY, JSON.stringify(settings));
+    window.cineSettings = settings;
   }
 
   function updateConnectionStatus(isConnected) {
@@ -832,8 +952,6 @@
   // Dashboard Functions
   async function loadDashboard() {
     try {
-      showLoading('dashboardLoading', true);
-      
       if (movies.length === 0) {
         movies = await api.getMovies();
       }
@@ -870,8 +988,6 @@
     } catch (error) {
       console.error('Failed to load dashboard:', error);
       showToast('Failed to load dashboard data', 'danger');
-    } finally {
-      showLoading('dashboardLoading', false);
     }
   }
 
@@ -892,8 +1008,8 @@
   }
 
   function renderMovies() {
-    const search = document.getElementById('searchMovies').value.toLowerCase();
-    const statusFilter = document.getElementById('filterStatus').value;
+    const search = document.getElementById('searchMovies')?.value.toLowerCase() || '';
+    const statusFilter = document.getElementById('filterStatus')?.value || 'all';
     
     let filteredMovies = [...movies];
 
@@ -1014,8 +1130,18 @@
     try {
       await api.updateMovie(id, updatedMovie);
       movie.status = newStatus;
+      if (newStatus === 'published') {
+        movie.publishedAt = new Date().toISOString();
+      } else {
+        movie.publishedAt = null;
+        movie.views = 0;
+      }
       showToast(`Movie ${newStatus === 'published' ? 'published' : 'unpublished'} successfully`, 'success');
       renderMovies();
+      // Refresh dashboard if currently viewing it
+      if (document.getElementById('dashboard-page').classList.contains('active')) {
+        loadDashboard();
+      }
     } catch (error) {
       console.error('Failed to update movie status:', error);
       showToast('Failed to update movie status', 'danger');
@@ -1232,7 +1358,7 @@
 
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', () => {
-      sessionStorage.removeItem(CONFIG.AUTH_TOKEN_KEY);
+      window.cineAuthToken = null;
       authToken = null;
       movies = [];
       bootstrap.Modal.getOrCreateInstance(document.getElementById('loginModal')).show();
