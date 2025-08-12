@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CineReview CMS - Admin Panel</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<style>
+  body {
+    min-height: 100vh;
+    display: flex;
+    overflow-x: hidden;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  #sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    color: #eee;
+    flex-shrink: 0;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+    position: relative;
+  }
+  #sidebar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  #sidebar .nav-link {
+    color: #bbb;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin: 2px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  #sidebar .nav-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.5s;
+  }
+  #sidebar .nav-link:hover::before {
+    left: 100%;
+  }
+  #sidebar .nav-link.active,
+  #sidebar .nav-link:hover {
+    color: white;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+  #main-content {
+    flex-grow: 1;
+    padding: 30px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    margin: 20px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+  .page { 
+    display: none; 
+    animation: fadeIn 0.3s ease-in;
+  }
+  .page.active { 
+    display: block; 
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  #posterPreview {
+    margin-top: 10px;
+    max-width: 150px;
+    max-height: 225px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+  }
+  #posterPreview:hover {
+    transform: scale(1.05);
+  }
+  .toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1055;
+  }
+  .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+  }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  }
+  .btn {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+  .btn:hover::before {
+    left: 100%;
+  }
+  .btn-primary {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border: none;
+  }
+  .btn-success {
+    background: linear-gradient(45deg, #56ab2f, #a8e6cf);
+    border: none;
+  }
+  .table {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+  .table thead th {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 15px;
+  }
+  .form-control, .form-select {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+  }
+  .form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  }
+  .loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(102, 126, 234, 0.3);
+    border-radius: 50%;
+    border-top-color: #667eea;
+    animation: spin 1s ease-in-out infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .status-indicator {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #28a745;
+    animation: pulse 2s infinite;
+  }
+  .status-indicator.offline {
+    background: #dc3545;
+  }
+  @keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+  }
+  .modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+  }
+</style>
+</head>
+<body>
+<!-- Status Indicator -->
+<div class="status-indicator" id="connectionStatus" title="API Connection Status"></div>
+
+<!-- Sidebar -->
+<nav id="sidebar" class="d-flex flex-column p-3">
+  <h3 class="mb-4 text-center">
+    <i class="fas fa-film me-2"></i>CineReview CMS
+  </h3>
+  <ul class="nav nav-pills flex-column mb-auto">
+    <li><a href="#" class="nav-link active" data-page="dashboard"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+    <li><a href="#" class="nav-link" data-page="movies"><i class="fas fa-film me-2"></i>Manage Movies</a></li>
+    <li><a href="#" class="nav-link" data-page="add-movie"><i class="fas fa-plus me-2"></i>Add Movie</a></li>
+    <li><a href="#" class="nav-link" data-page="settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+    <li><a href="#" class="nav-link text-danger" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+  </ul>
+  <div class="mt-auto text-center text-muted small">
+    <i class="fas fa-user me-1"></i><span id="currentUser">Admin</span>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div id="main-content" class="flex-grow-1">
+  <h1 id="pageTitle" class="mb-4">Dashboard</h1>
+
+  <!-- Dashboard Page -->
+  <section id="dashboard-page" class="page active">
+    <div class="row mb-4">
+      <div class="col-sm-6 col-lg-3 mb-3">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="fas fa-film fa-2x mb-3 text-primary"></i>
+            <h5>Total Movies</h5>
+            <h3 id="totalMoviesCount" class="text-primary">
+              <span class="loading-spinner"></span>
+            </h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3 mb-3">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="fas fa-eye fa-2x mb-3 text-success"></i>
+            <h5>Published Movies</h5>
+            <h3 id="publishedMoviesCount" class="text-success">
+              <span class="loading-spinner"></span>
+            </h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3 mb-3">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="fas fa-chart-line fa-2x mb-3 text-info"></i>
+            <h5>Total Views</h5>
+            <h3 id="totalViewsCount" class="text-info">
+              <span class="loading-spinner"></span>
+            </h3>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3 mb-3">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="fas fa-heart fa-2x mb-3 text-danger"></i>
+            <h5>Total Likes</h5>
+            <h3 id="totalLikesCount" class="text-danger">
+              <span class="loading-spinner"></span>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <div class="card-header bg-gradient">
+        <h4 class="mb-0"><i class="fas fa-clock me-2"></i>Recent Movies</h4>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Genre</th>
+                <th>Rating</th>
+                <th>Status</th>
+                <th>Views</th>
+                <th>Published At</th>
+              </tr>
+            </thead>
+            <tbody id="recentMoviesTable">
+              <tr>
+                <td colspan="6" class="text-center">
+                  <span class="loading-spinner me-2"></span>Loading recent movies...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Movies Page -->
+  <section id="movies-page" class="page">
+    <div class="row mb-4">
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text"><i class="fas fa-search"></i></span>
+          <input type="text" class="form-control" id="searchMovies" placeholder="Search movies..." />
+        </div>
+      </div>
+      <div class="col-md-3">
+        <select id="filterStatus" class="form-select">
+          <option value="all">All Status</option>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+      <div class="col-md-5 text-end">
+        <button class="btn btn-primary" data-page="add-movie">
+          <i class="fas fa-plus me-2"></i>Add New Movie
+        </button>
+        <button class="btn btn-outline-secondary" onclick="refreshMovies()">
+          <i class="fas fa-sync-alt me-2"></i>Refresh
+        </button>
+      </div>
+    </div>
+    
+    <div id="moviesLoading" class="text-center mb-3" style="display:none;">
+      <span class="loading-spinner me-2"></span>Loading movies...
+    </div>
+    
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th style="width: 80px;">Poster</th>
+                <th>Title & Reviewer</th>
+                <th>Genre</th>
+                <th>Rating</th>
+                <th>Year</th>
+                <th>Status</th>
+                <th>Views</th>
+                <th style="width: 150px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="moviesTable">
+              <tr>
+                <td colspan="8" class="text-center py-4">
+                  <span class="loading-spinner me-2"></span>Loading movies...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Add/Edit Movie Page -->
+  <section id="add-movie-page" class="page">
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-header">
+            <h4 id="movieFormTitle" class="mb-0">Add New Movie</h4>
+          </div>
+          <div class="card-body">
+            <form id="movieForm" class="needs-validation" novalidate>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="title" class="form-label">Title *</label>
+                  <input type="text" id="title" name="title" class="form-control" required />
+                  <div class="invalid-feedback">Title is required.</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="reviewer" class="form-label">Reviewer *</label>
+                  <input type="text" id="reviewer" name="reviewer" class="form-control" required />
+                  <div class="invalid-feedback">Reviewer is required.</div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label for="genre" class="form-label">Genre *</label>
+                  <input type="text" id="genre" name="genre" class="form-control" required />
+                  <div class="invalid-feedback">Genre is required.</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label for="rating" class="form-label">Rating (0-10) *</label>
+                  <input type="number" id="rating" name="rating" class="form-control" min="0" max="10" step="0.1" required />
+                  <div class="invalid-feedback">Rating between 0 and 10 is required.</div>
+                </div>
+                <div class="col-md-4 mb-3">
+                  <label for="year" class="form-label">Year *</label>
+                  <input type="number" id="year" name="year" class="form-control" min="1900" max="2099" required />
+                  <div class="invalid-feedback">Valid year is required.</div>
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="status" class="form-label">Status *</label>
+                  <select id="status" name="status" class="form-select" required>
+                    <option value="draft">Draft</option>
+                    <option value="published">Published</option>
+                  </select>
+                  <div class="invalid-feedback">Status is required.</div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="posterUrl" class="form-label">Poster URL</label>
+                  <input type="url" id="posterUrl" name="poster" class="form-control" placeholder="https://example.com/poster.jpg" />
+                  <div class="invalid-feedback">Please enter a valid URL.</div>
+                </div>
+              </div>
+              
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success" id="saveMovieBtn">
+                  <i class="fas fa-save me-2"></i>Save Movie
+                </button>
+                <button type="button" class="btn btn-secondary" id="cancelMovieBtn">
+                  <i class="fas fa-times me-2"></i>Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Poster Preview</h5>
+          </div>
+          <div class="card-body text-center">
+            <img id="posterPreview" src="" alt="Poster Preview" style="display:none;" />
+            <div id="posterPlaceholder" class="text-muted">
+              <i class="fas fa-image fa-3x mb-3"></i>
+              <p>Enter poster URL to see preview</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Settings Page -->
+  <section id="settings-page" class="page">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="mb-0"><i class="fas fa-cog me-2"></i>General Settings</h4>
+          </div>
+          <div class="card-body">
+            <form id="settingsForm" class="needs-validation" novalidate>
+              <div class="mb-3">
+                <label for="adminEmail" class="form-label">Admin Email</label>
+                <input type="email" id="adminEmail" name="adminEmail" class="form-control" required />
+                <div class="invalid-feedback">Valid email is required.</div>
+              </div>
+              <div class="mb-3">
+                <label for="siteTitle" class="form-label">Site Title</label>
+                <input type="text" id="siteTitle" name="siteTitle" class="form-control" required />
+                <div class="invalid-feedback">Site title is required.</div>
+              </div>
+              <div class="mb-3">
+                <label for="apiEndpoint" class="form-label">API Endpoint</label>
+                <input type="url" id="apiEndpoint" name="apiEndpoint" class="form-control" placeholder="https://api.example.com" />
+                <div class="form-text">Configure your API backend endpoint</div>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>Save Settings
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-6">
+        <div class="card">
+          <div class="card-header">
+            <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>API Status</h4>
+          </div>
+          <div class="card-body">
+            <div id="apiStatus" class="mb-3">
+              <span class="loading-spinner me-2"></span>Checking API connection...
+            </div>
+            <button class="btn btn-outline-primary" onclick="testApiConnection()">
+              <i class="fas fa-plug me-2"></i>Test Connection
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="loginForm" class="modal-content needs-validation" novalidate>
+      <div class="modal-header text-center border-0">
+        <div class="w-100">
+          <h5 class="modal-title mb-0" id="loginModalLabel">
+            <i class="fas fa-film me-2"></i>CineReview CMS
+          </h5>
+          <small class="text-muted">Admin Panel Access</small>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="loginEmail" class="form-label">Email</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+            <input type="email" id="loginEmail" class="form-control" required />
+          </div>
+          <div class="invalid-feedback">Please enter your email.</div>
+        </div>
+        <div class="mb-3">
+          <label for="loginPassword" class="form-label">Password</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+            <input type="password" id="loginPassword" class="form-control" required />
+          </div>
+          <div class="invalid-feedback">Please enter your password.</div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="submit" class="btn btn-primary w-100" id="loginBtn">
+          <i class="fas fa-sign-in-alt me-2"></i>Login
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+(() => {
+  // Configuration
+  const CONFIG = {
+    API_BASE_URL: 'https://jsonplaceholder.typicode.com', // Demo API
+    AUTH_TOKEN_KEY: 'cineAuthToken',
+    SETTINGS_KEY: 'cineSettings'
+  };
+
+  let authToken = null;
+  let currentMovieId = null;
+  let movies = [];
+  let settings = {};
+
+  // API Helper Class
+  class ApiClient {
+    constructor(baseUrl) {
+      this.baseUrl = baseUrl;
+    }
+
+    async request(endpoint, options = {}) {
+      const url = `${this.baseUrl}${endpoint}`;
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authToken && { 'Authorization': `Bearer ${authToken.token}` }),
+          ...options.headers
+        },
+        ...options
+      };
+
+      try {
+        const response = await fetch(url, config);
+        
+        // Update connection status
+        updateConnectionStatus(true);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        return await response.json();
+      } catch (error) {
+        updateConnectionStatus(false);
+        console.error('API request failed:', error);
+        throw error;
+      }
+    }
+
+    // Movies endpoints
+    async getMovies() {
+      // Using JSONPlaceholder posts as demo movies
+      const posts = await this.request('/posts');
+      return posts.slice(0, 20).map(post => ({
+        id: post.id,
+        title: post.title.charAt(0).toUpperCase() + post.title.slice(1),
+        reviewer: `Reviewer ${post.userId}`,
+        genre: ['Drama', 'Action', 'Comedy', 'Horror', 'Sci-Fi'][post.id % 5],
+        rating: (Math.random() * 10).toFixed(1),
+        year: 2020 + (post.id % 5),
+        status: post.id % 3 === 0 ? 'draft' : 'published',
+        posterUrl: `https://picsum.photos/300/450?random=${post.id}`,
+        views: Math.floor(Math.random() * 10000),
+        likes: Math.floor(Math.random() * 1000),
+        createdAt: Date.now() - (post.id * 86400000),
+        publishedAt: post.id % 3 !== 0 ? new Date(Date.now() - (post.id * 86400000)).toISOString() : null
+      }));
+    }
+
+    async getMovie(id) {
+      const post = await this.request(`/posts/${id}`);
+      return {
+        id: post.id,
+        title: post.title.charAt(0).toUpperCase() + post.title.slice(1),
+        reviewer: `Reviewer ${post.userId}`,
+        genre: ['Drama', 'Action', 'Comedy', 'Horror', 'Sci-Fi'][post.id % 5],
+        rating: (Math.random() * 10).toFixed(1),
+        year: 2020 + (post.id % 5),
+        status: post.id % 3 === 0 ? 'draft' : 'published',
+        posterUrl: `https://picsum.photos/300/450?random=${post.id}`,
+        views: Math.floor(Math.random() * 10000),
+        likes: Math.floor(Math.random() * 1000),
+        createdAt: Date.now() - (post.id * 86400000),
+        publishedAt: post.id % 3 !== 0 ? new Date(Date.now() - (post.id * 86400000)).toISOString() : null
+      };
+    }
+
+    async createMovie(movieData) {
+      const response = await this.request('/posts', {
+        method: 'POST',
+        body: JSON.stringify(movieData)
+      });
+      return { ...movieData, id: response.id || Math.floor(Math.random() * 1000000) };
+    }
+
+    async updateMovie(id, movieData) {
+      const response = await this.request(`/posts/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify(movieData)
+      });
+      return { ...movieData, id };
+    }
+
+    async deleteMovie(id) {
+      await this.request(`/posts/${id}`, {
+        method: 'DELETE'
+      });
+      return { success: true };
+    }
+
+    async login(credentials) {
+      // Simulate login - in real app, this would validate credentials
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+      
+      if (credentials.email && credentials.password) {
+        return {
+          token: 'fake-jwt-token-' + Date.now(),
+          user: {
+            email: credentials.email,
+            name: 'Admin User',
+            role: 'admin'
+          }
+        };
+      }
+      throw new Error('Invalid credentials');
+    }
+
+    async testConnection() {
+      try {
+        await this.request('/posts/1');
+        return { status: 'connected', message: 'API connection successful' };
+      } catch (error) {
+        return { status: 'error', message: error.message };
+      }
+    }
+  }
+
+  const api = new ApiClient(CONFIG.API_BASE_URL);
+
+  // Helper Functions
+  function saveToken(token) {
+    authToken = token;
+    sessionStorage.setItem(CONFIG.AUTH_TOKEN_KEY, JSON.stringify(token));
+  }
+
+  function loadToken() {
+    const token = sessionStorage.getItem(CONFIG.AUTH_TOKEN_KEY);
+    if (token) {
+      try {
+        authToken = JSON.parse(token);
+        return true;
+      } catch (error) {
+        console.error('Failed to parse stored token:', error);
+        sessionStorage.removeItem(CONFIG.AUTH_TOKEN_KEY);
+      }
+    }
+    return false;
+  }
+
+  function loadSettings() {
+    const stored = JSON.parse(localStorage.getItem(CONFIG.SETTINGS_KEY) || '{}');
+    settings = {
+      adminEmail: 'admin@cinereview.com',
+      siteTitle: 'CineReview CMS',
+      apiEndpoint: CONFIG.API_BASE_URL,
+      ...stored
+    };
+    return settings;
+  }
+
+  function saveSettings(newSettings) {
+    settings = { ...settings, ...newSettings };
+    localStorage.setItem(CONFIG.SETTINGS_KEY, JSON.stringify(settings));
+  }
+
+  function updateConnectionStatus(isConnected) {
+    const indicator = document.getElementById('connectionStatus');
+    indicator.className = `status-indicator ${isConnected ? '' : 'offline'}`;
+    indicator.title = isConnected ? 'API Connected' : 'API Disconnected';
+  }
+
+  // UI Functions
+  function showPage(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const el = document.getElementById(page + '-page');
+    if (el) el.classList.add('active');
+
+    document.querySelectorAll('#sidebar .nav-link').forEach(link => {
+      link.classList.toggle('active', link.dataset.page === page);
+    });
+
+    document.getElementById('pageTitle').textContent = {
+      dashboard: 'Dashboard',
+      movies: 'Manage Movies',
+      'add-movie': 'Add New Movie',
+      settings: 'Settings'
+    }[page] || '';
+
+    // Load page-specific data
+    switch (page) {
+      case 'dashboard':
+        loadDashboard();
+        break;
+      case 'movies':
+        loadMovies();
+        break;
+      case 'add-movie':
+        resetMovieForm();
+        break;
+      case 'settings':
+        loadSettingsForm();
+        break;
+    }
+  }
+
+  function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    const toastId = 'toast-' + Date.now();
+    const toast = document.createElement('div');
+    toast.id = toastId;
+    toast.className = `toast align-items-center text-bg-${type} border-0 show shadow`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    const iconMap = {
+      success: 'fas fa-check-circle',
+      danger: 'fas fa-exclamation-triangle',
+      warning: 'fas fa-exclamation-circle',
+      info: 'fas fa-info-circle'
+    };
+    
+    toast.innerHTML = `
+      <div class="d-flex">
+        <div class="toast-body">
+          <i class="${iconMap[type]} me-2"></i>${escapeHtml(message)}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    `;
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+      const toastElement = document.getElementById(toastId);
+      if (toastElement) {
+        toastElement.classList.remove('show');
+        setTimeout(() => toastElement.remove(), 300);
+      }
+    }, 5000);
+  }
+
+  function showLoading(elementId, show = true) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.style.display = show ? 'block' : 'none';
+    }
+  }
+
+  function setLoadingButton(buttonId, loading = true) {
+    const button = document.getElementById(buttonId);
+    if (button) {
+      button.disabled = loading;
+      if (loading) {
+        button.dataset.originalText = button.innerHTML;
+        button.innerHTML = '<span class="loading-spinner me-2"></span>Loading...';
+      } else {
+        button.innerHTML = button.dataset.originalText || button.innerHTML;
+      }
+    }
+  }
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    return text.toString().replace(/[&<>"']/g, m => {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
+    });
+  }
+
+  function formatNumber(num) {
+    return new Intl.NumberFormat().format(num || 0);
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return 'Not published';
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }).format(new Date(dateStr));
+  }
+
+  // Dashboard Functions
+  async function loadDashboard() {
+    try {
+      showLoading('dashboardLoading', true);
+      
+      if (movies.length === 0) {
+        movies = await api.getMovies();
+      }
+      
+      const totalMovies = movies.length;
+      const publishedMovies = movies.filter(m => m.status === 'published').length;
+      const totalViews = movies.reduce((sum, movie) => sum + (movie.views || 0), 0);
+      const totalLikes = movies.reduce((sum, movie) => sum + (movie.likes || 0), 0);
+
+      document.getElementById('totalMoviesCount').textContent = formatNumber(totalMovies);
+      document.getElementById('publishedMoviesCount').textContent = formatNumber(publishedMovies);
+      document.getElementById('totalViewsCount').textContent = formatNumber(totalViews);
+      document.getElementById('totalLikesCount').textContent = formatNumber(totalLikes);
+
+      // Recent movies table
+      const recentMovies = [...movies]
+        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+        .slice(0, 5);
+        
+      const tbody = document.getElementById('recentMoviesTable');
+      tbody.innerHTML = recentMovies.length === 0 
+        ? '<tr><td colspan="6" class="text-center text-muted py-4">No movies found</td></tr>'
+        : recentMovies.map(movie => `
+          <tr>
+            <td><strong>${escapeHtml(movie.title)}</strong></td>
+            <td><span class="badge bg-secondary">${escapeHtml(movie.genre)}</span></td>
+            <td><span class="text-warning"><i class="fas fa-star"></i> ${movie.rating}/10</span></td>
+            <td><span class="badge bg-${movie.status === 'published' ? 'success' : 'warning'}">${escapeHtml(movie.status)}</span></td>
+            <td><i class="fas fa-eye me-1"></i>${formatNumber(movie.views)}</td>
+            <td>${formatDate(movie.publishedAt)}</td>
+          </tr>
+        `).join('');
+        
+    } catch (error) {
+      console.error('Failed to load dashboard:', error);
+      showToast('Failed to load dashboard data', 'danger');
+    } finally {
+      showLoading('dashboardLoading', false);
+    }
+  }
+
+  // Movies Functions
+  async function loadMovies() {
+    try {
+      showLoading('moviesLoading', true);
+      movies = await api.getMovies();
+      renderMovies();
+    } catch (error) {
+      console.error('Failed to load movies:', error);
+      showToast('Failed to load movies', 'danger');
+      document.getElementById('moviesTable').innerHTML = 
+        '<tr><td colspan="8" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle me-2"></i>Failed to load movies</td></tr>';
+    } finally {
+      showLoading('moviesLoading', false);
+    }
+  }
+
+  function renderMovies() {
+    const search = document.getElementById('searchMovies').value.toLowerCase();
+    const statusFilter = document.getElementById('filterStatus').value;
+    
+    let filteredMovies = [...movies];
+
+    if (statusFilter !== 'all') {
+      filteredMovies = filteredMovies.filter(m => m.status === statusFilter);
+    }
+    
+    if (search) {
+      filteredMovies = filteredMovies.filter(m => 
+        m.title.toLowerCase().includes(search) || 
+        (m.reviewer && m.reviewer.toLowerCase().includes(search)) ||
+        (m.genre && m.genre.toLowerCase().includes(search))
+      );
+    }
+
+    const tbody = document.getElementById('moviesTable');
+    
+    if (filteredMovies.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4"><i class="fas fa-search me-2"></i>No movies found matching your criteria</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = filteredMovies.map(movie => `
+      <tr>
+        <td>
+          <img src="${escapeHtml(movie.posterUrl || '')}" 
+               alt="${escapeHtml(movie.title)}" 
+               style="width:50px;height:75px;object-fit:cover;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);" 
+               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNzUiIHZpZXdCb3g9IjAgMCA1MCA3NSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9Ijc1IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yNSAzN0MyOC4zMTM3IDM3IDMxIDM0LjMxMzcgMzEgMzFDMzEgMjcuNjg2MyAyOC4zMTM3IDI1IDI1IDI1QzIxLjY4NjMgMjUgMTkgMjcuNjg2MyAxOSAzMUMxOSAzNC4zMTM3IDIxLjY4NjMgMzcgMjUgMzdaIiBmaWxsPSIjOUM5Qzk4Ii8+CjxwYXRoIGQ9Ik0zNSA0NUgyNUMxOS40NzcyIDQ1IDE1IDQ5LjQ3NzIgMTUgNTVWNTdIMzVWNDVaIiBmaWxsPSIjOUM5Qzk4Ii8+Cjwvc3ZnPgo='" />
+        </td>
+        <td>
+          <div class="fw-bold">${escapeHtml(movie.title)}</div>
+          <small class="text-muted">by ${escapeHtml(movie.reviewer)}</small>
+        </td>
+        <td><span class="badge bg-secondary">${escapeHtml(movie.genre)}</span></td>
+        <td>
+          <div class="d-flex align-items-center">
+            <i class="fas fa-star text-warning me-1"></i>
+            <span class="fw-bold">${movie.rating}/10</span>
+          </div>
+        </td>
+        <td>${movie.year || 'N/A'}</td>
+        <td><span class="badge bg-${movie.status === 'published' ? 'success' : 'warning'}">${escapeHtml(movie.status)}</span></td>
+        <td>
+          <div class="d-flex align-items-center">
+            <i class="fas fa-eye text-muted me-1"></i>
+            ${formatNumber(movie.views)}
+          </div>
+        </td>
+        <td>
+          <div class="btn-group btn-group-sm" role="group">
+            <button class="btn btn-outline-primary" title="Edit" onclick="editMovie(${movie.id})">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-outline-danger" title="Delete" onclick="deleteMovie(${movie.id})">
+              <i class="fas fa-trash"></i>
+            </button>
+            <button class="btn btn-outline-secondary" title="Toggle Status" onclick="toggleMovieStatus(${movie.id})">
+              <i class="fas fa-eye${movie.status === 'published' ? '-slash' : ''}"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // Movie CRUD Functions
+  window.editMovie = async function(id) {
+    try {
+      setLoadingButton('saveMovieBtn', true);
+      const movie = movies.find(m => m.id === id) || await api.getMovie(id);
+      
+      currentMovieId = id;
+      document.getElementById('movieFormTitle').textContent = 'Edit Movie';
+      
+      // Populate form
+      ['title', 'reviewer', 'genre', 'rating', 'year', 'status'].forEach(field => {
+        const element = document.getElementById(field);
+        if (element) element.value = movie[field] || '';
+      });
+      
+      document.getElementById('posterUrl').value = movie.posterUrl || '';
+      updatePosterPreview(movie.posterUrl);
+      
+      showPage('add-movie');
+    } catch (error) {
+      console.error('Failed to load movie for editing:', error);
+      showToast('Failed to load movie details', 'danger');
+    } finally {
+      setLoadingButton('saveMovieBtn', false);
+    }
+  };
+
+  window.deleteMovie = async function(id) {
+    const movie = movies.find(m => m.id === id);
+    if (!movie) return;
+    
+    if (!confirm(`Are you sure you want to delete "${movie.title}"?`)) return;
+    
+    try {
+      await api.deleteMovie(id);
+      movies = movies.filter(m => m.id !== id);
+      showToast('Movie deleted successfully', 'success');
+      renderMovies();
+    } catch (error) {
+      console.error('Failed to delete movie:', error);
+      showToast('Failed to delete movie', 'danger');
+    }
+  };
+
+  window.toggleMovieStatus = async function(id) {
+    const movie = movies.find(m => m.id === id);
+    if (!movie) return;
+    
+    const newStatus = movie.status === 'published' ? 'draft' : 'published';
+    const updatedMovie = { ...movie, status: newStatus };
+    
+    try {
+      await api.updateMovie(id, updatedMovie);
+      movie.status = newStatus;
+      showToast(`Movie ${newStatus === 'published' ? 'published' : 'unpublished'} successfully`, 'success');
+      renderMovies();
+    } catch (error) {
+      console.error('Failed to update movie status:', error);
+      showToast('Failed to update movie status', 'danger');
+    }
+  };
+
+  window.refreshMovies = function() {
+    loadMovies();
+  };
+
+  // Movie Form Functions
+  function resetMovieForm() {
+    currentMovieId = null;
+    document.getElementById('movieFormTitle').textContent = 'Add New Movie';
+    document.getElementById('movieForm').reset();
+    document.getElementById('movieForm').classList.remove('was-validated');
+    updatePosterPreview('');
+  }
+
+  function updatePosterPreview(url) {
+    const preview = document.getElementById('posterPreview');
+    const placeholder = document.getElementById('posterPlaceholder');
+    
+    if (url && isValidUrl(url)) {
+      preview.src = url;
+      preview.style.display = 'block';
+      placeholder.style.display = 'none';
+    } else {
+      preview.style.display = 'none';
+      placeholder.style.display = 'block';
+    }
+  }
+
+  function isValidUrl(string) {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // Settings Functions
+  function loadSettingsForm() {
+    const currentSettings = loadSettings();
+    document.getElementById('adminEmail').value = currentSettings.adminEmail || '';
+    document.getElementById('siteTitle').value = currentSettings.siteTitle || '';
+    document.getElementById('apiEndpoint').value = currentSettings.apiEndpoint || '';
+    testApiConnection();
+  }
+
+  window.testApiConnection = async function() {
+    const statusDiv = document.getElementById('apiStatus');
+    statusDiv.innerHTML = '<span class="loading-spinner me-2"></span>Testing connection...';
+    
+    try {
+      const result = await api.testConnection();
+      statusDiv.innerHTML = `
+        <div class="alert alert-${result.status === 'connected' ? 'success' : 'danger'} mb-0">
+          <i class="fas fa-${result.status === 'connected' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+          ${result.message}
+        </div>
+      `;
+    } catch (error) {
+      statusDiv.innerHTML = `
+        <div class="alert alert-danger mb-0">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Connection failed: ${error.message}
+        </div>
+      `;
+    }
+  };
+
+  // Event Listeners
+  document.addEventListener('DOMContentLoaded', function() {
+    // Load saved settings and token
+    loadSettings();
+    const hasToken = loadToken();
+    
+    if (hasToken) {
+      document.getElementById('currentUser').textContent = authToken.user?.name || 'Admin';
+      showPage('dashboard');
+    } else {
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('loginModal')).show();
+    }
+
+    // Sidebar navigation
+    document.querySelectorAll('#sidebar .nav-link[data-page]').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const page = e.currentTarget.dataset.page;
+        showPage(page);
+      });
+    });
+
+    // Search and filter for movies
+    document.getElementById('searchMovies').addEventListener('input', debounce(renderMovies, 300));
+    document.getElementById('filterStatus').addEventListener('change', renderMovies);
+
+    // Poster URL preview
+    document.getElementById('posterUrl').addEventListener('input', function() {
+      updatePosterPreview(this.value.trim());
+    });
+
+    // Movie form submission
+    document.getElementById('movieForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      if (!this.checkValidity()) {
+        this.classList.add('was-validated');
+        return;
+      }
+
+      setLoadingButton('saveMovieBtn', true);
+
+      try {
+        const formData = new FormData(this);
+        const movieData = {
+          title: formData.get('title').trim(),
+          reviewer: formData.get('reviewer').trim(),
+          genre: formData.get('genre').trim(),
+          rating: parseFloat(formData.get('rating')),
+          year: parseInt(formData.get('year'), 10),
+          status: formData.get('status'),
+          posterUrl: formData.get('poster').trim(),
+          views: 0,
+          likes: 0,
+          createdAt: Date.now(),
+          publishedAt: formData.get('status') === 'published' ? new Date().toISOString() : null
+        };
+
+        let savedMovie;
+        if (currentMovieId) {
+          savedMovie = await api.updateMovie(currentMovieId, movieData);
+          const index = movies.findIndex(m => m.id === currentMovieId);
+          if (index !== -1) movies[index] = savedMovie;
+          showToast('Movie updated successfully', 'success');
+        } else {
+          savedMovie = await api.createMovie(movieData);
+          movies.push(savedMovie);
+          showToast('Movie added successfully', 'success');
+        }
+
+        resetMovieForm();
+        showPage('movies');
+        
+      } catch (error) {
+        console.error('Failed to save movie:', error);
+        showToast('Failed to save movie', 'danger');
+      } finally {
+        setLoadingButton('saveMovieBtn', false);
+      }
+    });
+
+    // Cancel movie form
+    document.getElementById('cancelMovieBtn').addEventListener('click', () => {
+      resetMovieForm();
+      showPage('movies');
+    });
+
+    // Settings form submission
+    document.getElementById('settingsForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (!this.checkValidity()) {
+        this.classList.add('was-validated');
+        return;
+      }
+
+      const formData = new FormData(this);
+      const newSettings = {
+        adminEmail: formData.get('adminEmail').trim(),
+        siteTitle: formData.get('siteTitle').trim(),
+        apiEndpoint: formData.get('apiEndpoint').trim()
+      };
+
+      saveSettings(newSettings);
+      showToast('Settings saved successfully', 'success');
+    });
+
+    // Login form submission
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      if (!this.checkValidity()) {
+        this.classList.add('was-validated');
+        return;
+      }
+
+      setLoadingButton('loginBtn', true);
+
+      try {
+        const formData = new FormData(this);
+        const credentials = {
+          email: formData.get('loginEmail') || document.getElementById('loginEmail').value.trim(),
+          password: formData.get('loginPassword') || document.getElementById('loginPassword').value.trim()
+        };
+
+        const response = await api.login(credentials);
+        saveToken(response);
+        document.getElementById('currentUser').textContent = response.user?.name || 'Admin';
+        
+        bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+        showToast('Login successful!', 'success');
+        showPage('dashboard');
+        
+      } catch (error) {
+        console.error('Login failed:', error);
+        showToast('Login failed. Please try again.', 'danger');
+      } finally {
+        setLoadingButton('loginBtn', false);
+      }
+    });
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.removeItem(CONFIG.AUTH_TOKEN_KEY);
+      authToken = null;
+      movies = [];
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('loginModal')).show();
+      showToast('Logged out successfully', 'info');
+    });
+
+    // Bootstrap form validation
+    document.querySelectorAll('.needs-validation').forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  });
+
+  // Utility Functions
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  // Initialize connection status
+  updateConnectionStatus(false);
+
+})();
+</script>
+</body>
+</html>
