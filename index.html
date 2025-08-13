@@ -3,158 +3,122 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>CineReview CMS - Admin Panel</title>
+<title>CineReview - Movie Reviews</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 <style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --dark-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    --hover-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  }
+
   body {
-    min-height: 100vh;
-    display: flex;
-    overflow-x: hidden;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--primary-gradient);
+    min-height: 100vh;
   }
-  #sidebar {
-    width: 260px;
-    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-    color: #eee;
-    flex-shrink: 0;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+
+  .navbar {
+    background: var(--dark-gradient) !important;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--card-shadow);
+  }
+
+  .hero-section {
+    background: var(--dark-gradient);
+    color: white;
+    padding: 4rem 0;
     position: relative;
+    overflow: hidden;
   }
-  #sidebar::before {
+
+  .hero-section::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(45deg, rgba(255,255,255,0.05) 0%, transparent 100%);
+    background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 100%);
     pointer-events: none;
   }
-  #sidebar .nav-link {
-    color: #bbb;
-    transition: all 0.3s ease;
-    border-radius: 8px;
-    margin: 2px 0;
-    position: relative;
-    overflow: hidden;
-  }
-  #sidebar .nav-link::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    transition: left 0.5s;
-  }
-  #sidebar .nav-link:hover::before {
-    left: 100%;
-  }
-  #sidebar .nav-link.active,
-  #sidebar .nav-link:hover {
-    color: white;
-    background: linear-gradient(45deg, #667eea, #764ba2);
-    transform: translateX(5px);
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-  }
-  #main-content {
-    flex-grow: 1;
-    padding: 30px;
+
+  .main-content {
     background: rgba(255,255,255,0.95);
     backdrop-filter: blur(10px);
     margin: 20px;
     border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    box-shadow: var(--card-shadow);
+    padding: 2rem;
   }
-  .page { 
-    display: none; 
-    animation: fadeIn 0.3s ease-in;
-  }
-  .page.active { 
-    display: block; 
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  #posterPreview {
-    margin-top: 10px;
-    max-width: 150px;
-    max-height: 225px;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    transition: transform 0.3s ease;
-  }
-  #posterPreview:hover {
-    transform: scale(1.05);
-  }
-  .toast-container {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    z-index: 1055;
-  }
-  .card {
+
+  .review-card {
     border: none;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
     background: linear-gradient(145deg, #ffffff, #f8f9fa);
+    overflow: hidden;
+    cursor: pointer;
+    height: 100%;
   }
-  .card:hover {
+
+  .review-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    box-shadow: var(--hover-shadow);
   }
-  .btn {
+
+  .review-card .poster {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 15px 15px 0 0;
+  }
+
+  .rating-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.8);
+    color: gold;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+  }
+
+  .search-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+  }
+
+  .btn-primary {
+    background: var(--primary-gradient);
+    border: none;
     border-radius: 10px;
     transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
   }
-  .btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    transition: left 0.5s;
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
   }
-  .btn:hover::before {
-    left: 100%;
-  }
-  .btn-primary {
-    background: linear-gradient(45deg, #667eea, #764ba2);
-    border: none;
-  }
-  .btn-success {
-    background: linear-gradient(45deg, #56ab2f, #a8e6cf);
-    border: none;
-  }
-  .table {
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-  }
-  .table thead th {
-    background: linear-gradient(45deg, #667eea, #764ba2);
-    color: white;
-    border: none;
-    padding: 15px;
-  }
-  .form-control, .form-select {
+
+  .form-control {
     border-radius: 10px;
     border: 2px solid #e9ecef;
     transition: all 0.3s ease;
   }
-  .form-control:focus, .form-select:focus {
+
+  .form-control:focus {
     border-color: #667eea;
     box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
   }
+
   .loading-spinner {
     display: inline-block;
     width: 20px;
@@ -164,1221 +128,1244 @@
     border-top-color: #667eea;
     animation: spin 1s ease-in-out infinite;
   }
+
   @keyframes spin {
     to { transform: rotate(360deg); }
   }
-  .status-indicator {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: #28a745;
-    animation: pulse 2s infinite;
+
+  .fade-in {
+    animation: fadeIn 0.5s ease-in;
   }
-  .status-indicator.offline {
-    background: #dc3545;
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-  @keyframes pulse {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
-  }
-  .modal-content {
+
+  .review-detail {
+    background: white;
     border-radius: 20px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+  }
+
+  .genre-badge {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: var(--dark-gradient);
     border: none;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+  }
+
+  .back-btn:hover {
+    transform: scale(1.1);
+    color: white;
+  }
+
+  .stats-section {
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .api-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: var(--dark-gradient);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    box-shadow: var(--card-shadow);
+    z-index: 1000;
+  }
+
+  .api-indicator.connected {
+    background: linear-gradient(45deg, #28a745, #20c997);
+  }
+
+  .api-indicator.error {
+    background: linear-gradient(45deg, #dc3545, #e74c3c);
+  }
+
+  @media (max-width: 768px) {
+    .main-content {
+      margin: 10px;
+      padding: 1rem;
+    }
+    
+    .hero-section {
+      padding: 2rem 0;
+    }
+    
+    .search-section {
+      padding: 1rem;
+    }
   }
 </style>
 </head>
 <body>
-<!-- Status Indicator -->
-<div class="status-indicator" id="connectionStatus" title="API Connection Status"></div>
 
-<!-- Sidebar -->
-<nav id="sidebar" class="d-flex flex-column p-3">
-  <h3 class="mb-4 text-center">
-    <i class="fas fa-film me-2"></i>CineReview CMS
-  </h3>
-  <ul class="nav nav-pills flex-column mb-auto">
-    <li><a href="#" class="nav-link active" data-page="dashboard"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
-    <li><a href="#" class="nav-link" data-page="movies"><i class="fas fa-film me-2"></i>Manage Movies</a></li>
-    <li><a href="#" class="nav-link" data-page="add-movie"><i class="fas fa-plus me-2"></i>Add Movie</a></li>
-    <li><a href="#" class="nav-link" data-page="settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
-    <li><a href="#" class="nav-link text-danger" id="logoutBtn"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-  </ul>
-  <div class="mt-auto text-center text-muted small">
-    <i class="fas fa-user me-1"></i><span id="currentUser">Admin</span>
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+  <div class="container">
+    <a class="navbar-brand" href="#" onclick="showHomePage()">
+      <i class="fas fa-film me-2"></i>CineReview
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showHomePage()">
+            <i class="fas fa-home me-1"></i>Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="showAdminPanel()">
+            <i class="fas fa-cog me-1"></i>Admin
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
 </nav>
 
-<!-- Main Content -->
-<div id="main-content" class="flex-grow-1">
-  <h1 id="pageTitle" class="mb-4">Dashboard</h1>
-
-  <!-- Dashboard Page -->
-  <section id="dashboard-page" class="page active">
-    <div class="row mb-4">
-      <div class="col-sm-6 col-lg-3 mb-3">
-        <div class="card text-center h-100">
-          <div class="card-body">
-            <i class="fas fa-film fa-2x mb-3 text-primary"></i>
-            <h5>Total Movies</h5>
-            <h3 id="totalMoviesCount" class="text-primary">
-              <span class="loading-spinner"></span>
-            </h3>
+<!-- Home Page -->
+<div id="homePage">
+  <!-- Hero Section -->
+  <section class="hero-section text-center">
+    <div class="container">
+      <h1 class="display-4 fw-bold mb-4">
+        <i class="fas fa-star text-warning me-3"></i>
+        CineReview
+      </h1>
+      <p class="lead mb-4">Discover the best movies through expert reviews and ratings</p>
+      <div class="stats-section d-inline-block">
+        <div class="row text-center">
+          <div class="col-4">
+            <h3 id="heroTotalReviews" class="text-primary mb-0">20+</h3>
+            <small>Reviews</small>
           </div>
-        </div>
-      </div>
-      <div class="col-sm-6 col-lg-3 mb-3">
-        <div class="card text-center h-100">
-          <div class="card-body">
-            <i class="fas fa-eye fa-2x mb-3 text-success"></i>
-            <h5>Published Movies</h5>
-            <h3 id="publishedMoviesCount" class="text-success">
-              <span class="loading-spinner"></span>
-            </h3>
+          <div class="col-4">
+            <h3 id="heroAvgRating" class="text-warning mb-0">8.5</h3>
+            <small>Avg Rating</small>
           </div>
-        </div>
-      </div>
-      <div class="col-sm-6 col-lg-3 mb-3">
-        <div class="card text-center h-100">
-          <div class="card-body">
-            <i class="fas fa-chart-line fa-2x mb-3 text-info"></i>
-            <h5>Total Views</h5>
-            <h3 id="totalViewsCount" class="text-info">
-              <span class="loading-spinner"></span>
-            </h3>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6 col-lg-3 mb-3">
-        <div class="card text-center h-100">
-          <div class="card-body">
-            <i class="fas fa-heart fa-2x mb-3 text-danger"></i>
-            <h5>Total Likes</h5>
-            <h3 id="totalLikesCount" class="text-danger">
-              <span class="loading-spinner"></span>
-            </h3>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="card">
-      <div class="card-header bg-gradient">
-        <h4 class="mb-0"><i class="fas fa-clock me-2"></i>Recent Movies</h4>
-      </div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Genre</th>
-                <th>Rating</th>
-                <th>Status</th>
-                <th>Views</th>
-                <th>Published At</th>
-              </tr>
-            </thead>
-            <tbody id="recentMoviesTable">
-              <tr>
-                <td colspan="6" class="text-center">
-                  <span class="loading-spinner me-2"></span>Loading recent movies...
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Movies Page -->
-  <section id="movies-page" class="page">
-    <div class="row mb-4">
-      <div class="col-md-4">
-        <div class="input-group">
-          <span class="input-group-text"><i class="fas fa-search"></i></span>
-          <input type="text" class="form-control" id="searchMovies" placeholder="Search movies..." />
-        </div>
-      </div>
-      <div class="col-md-3">
-        <select id="filterStatus" class="form-select">
-          <option value="all">All Status</option>
-          <option value="published">Published</option>
-          <option value="draft">Draft</option>
-        </select>
-      </div>
-      <div class="col-md-5 text-end">
-        <button class="btn btn-primary" data-page="add-movie">
-          <i class="fas fa-plus me-2"></i>Add New Movie
-        </button>
-        <button class="btn btn-outline-secondary" onclick="refreshMovies()">
-          <i class="fas fa-sync-alt me-2"></i>Refresh
-        </button>
-      </div>
-    </div>
-    
-    <div id="moviesLoading" class="text-center mb-3" style="display:none;">
-      <span class="loading-spinner me-2"></span>Loading movies...
-    </div>
-    
-    <div class="card">
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead>
-              <tr>
-                <th style="width: 80px;">Poster</th>
-                <th>Title & Reviewer</th>
-                <th>Genre</th>
-                <th>Rating</th>
-                <th>Year</th>
-                <th>Status</th>
-                <th>Views</th>
-                <th style="width: 150px;">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="moviesTable">
-              <tr>
-                <td colspan="8" class="text-center py-4">
-                  <span class="loading-spinner me-2"></span>Loading movies...
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Add/Edit Movie Page -->
-  <section id="add-movie-page" class="page">
-    <div class="row">
-      <div class="col-lg-8">
-        <div class="card">
-          <div class="card-header">
-            <h4 id="movieFormTitle" class="mb-0">Add New Movie</h4>
-          </div>
-          <div class="card-body">
-            <form id="movieForm" class="needs-validation" novalidate>
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="title" class="form-label">Title *</label>
-                  <input type="text" id="title" name="title" class="form-control" required />
-                  <div class="invalid-feedback">Title is required.</div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label for="reviewer" class="form-label">Reviewer *</label>
-                  <input type="text" id="reviewer" name="reviewer" class="form-control" required />
-                  <div class="invalid-feedback">Reviewer is required.</div>
-                </div>
-              </div>
-              
-              <div class="row">
-                <div class="col-md-4 mb-3">
-                  <label for="genre" class="form-label">Genre *</label>
-                  <input type="text" id="genre" name="genre" class="form-control" required />
-                  <div class="invalid-feedback">Genre is required.</div>
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="rating" class="form-label">Rating (0-10) *</label>
-                  <input type="number" id="rating" name="rating" class="form-control" min="0" max="10" step="0.1" required />
-                  <div class="invalid-feedback">Rating between 0 and 10 is required.</div>
-                </div>
-                <div class="col-md-4 mb-3">
-                  <label for="year" class="form-label">Year *</label>
-                  <input type="number" id="year" name="year" class="form-control" min="1900" max="2099" required />
-                  <div class="invalid-feedback">Valid year is required.</div>
-                </div>
-              </div>
-              
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="status" class="form-label">Status *</label>
-                  <select id="status" name="status" class="form-select" required>
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                  </select>
-                  <div class="invalid-feedback">Status is required.</div>
-                </div>
-                <div class="col-md-6 mb-3">
-                  <label for="posterUrl" class="form-label">Poster URL</label>
-                  <input type="url" id="posterUrl" name="poster" class="form-control" placeholder="https://example.com/poster.jpg" />
-                  <div class="invalid-feedback">Please enter a valid URL.</div>
-                </div>
-              </div>
-              
-              <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-success" id="saveMovieBtn">
-                  <i class="fas fa-save me-2"></i>Save Movie
-                </button>
-                <button type="button" class="btn btn-secondary" id="cancelMovieBtn">
-                  <i class="fas fa-times me-2"></i>Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      
-      <div class="col-lg-4">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0">Poster Preview</h5>
-          </div>
-          <div class="card-body text-center">
-            <img id="posterPreview" src="" alt="Poster Preview" style="display:none;" />
-            <div id="posterPlaceholder" class="text-muted">
-              <i class="fas fa-image fa-3x mb-3"></i>
-              <p>Enter poster URL to see preview</p>
-            </div>
+          <div class="col-4">
+            <h3 id="heroTotalViews" class="text-success mb-0">250K</h3>
+            <small>Views</small>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Settings Page -->
-  <section id="settings-page" class="page">
-    <div class="row">
-      <div class="col-lg-6">
-        <div class="card">
-          <div class="card-header">
-            <h4 class="mb-0"><i class="fas fa-cog me-2"></i>General Settings</h4>
-          </div>
-          <div class="card-body">
-            <form id="settingsForm" class="needs-validation" novalidate>
-              <div class="mb-3">
-                <label for="adminEmail" class="form-label">Admin Email</label>
-                <input type="email" id="adminEmail" name="adminEmail" class="form-control" required />
-                <div class="invalid-feedback">Valid email is required.</div>
-              </div>
-              <div class="mb-3">
-                <label for="siteTitle" class="form-label">Site Title</label>
-                <input type="text" id="siteTitle" name="siteTitle" class="form-control" required />
-                <div class="invalid-feedback">Site title is required.</div>
-              </div>
-              <div class="mb-3">
-                <label for="apiEndpoint" class="form-label">API Endpoint</label>
-                <input type="url" id="apiEndpoint" name="apiEndpoint" class="form-control" placeholder="https://api.example.com" />
-                <div class="form-text">Configure your API backend endpoint</div>
-              </div>
-              <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save me-2"></i>Save Settings
-              </button>
-            </form>
-          </div>
+  <div class="main-content">
+    <!-- Search Section -->
+    <div class="search-section">
+      <div class="row align-items-end">
+        <div class="col-md-6 mb-3">
+          <label for="searchInput" class="form-label fw-bold">
+            <i class="fas fa-search me-2"></i>Search Reviews
+          </label>
+          <input type="text" id="searchInput" class="form-control form-control-lg" 
+                 placeholder="Search by title, reviewer, or genre..." />
         </div>
-      </div>
-      
-      <div class="col-lg-6">
-        <div class="card">
-          <div class="card-header">
-            <h4 class="mb-0"><i class="fas fa-info-circle me-2"></i>API Status</h4>
-          </div>
-          <div class="card-body">
-            <div id="apiStatus" class="mb-3">
-              <span class="loading-spinner me-2"></span>Checking API connection...
-            </div>
-            <button class="btn btn-outline-primary" onclick="testApiConnection()">
-              <i class="fas fa-plug me-2"></i>Test Connection
-            </button>
-          </div>
+        <div class="col-md-3 mb-3">
+          <label for="genreFilter" class="form-label fw-bold">Filter by Genre</label>
+          <select id="genreFilter" class="form-select form-select-lg">
+            <option value="">All Genres</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label for="sortBy" class="form-label fw-bold">Sort By</label>
+          <select id="sortBy" class="form-select form-select-lg">
+            <option value="rating-desc">Rating (High to Low)</option>
+            <option value="rating-asc">Rating (Low to High)</option>
+            <option value="year-desc">Year (Newest First)</option>
+            <option value="year-asc">Year (Oldest First)</option>
+            <option value="title-asc">Title (A-Z)</option>
+            <option value="views-desc">Most Popular</option>
+          </select>
         </div>
       </div>
     </div>
-  </section>
+
+    <!-- Reviews Grid -->
+    <div id="reviewsContainer">
+      <div class="text-center py-5">
+        <div class="loading-spinner mb-3" style="width: 40px; height: 40px;"></div>
+        <p class="text-muted">Loading movie reviews...</p>
+      </div>
+    </div>
+
+    <!-- Load More Button -->
+    <div class="text-center mt-4">
+      <button id="loadMoreBtn" class="btn btn-primary btn-lg" style="display: none;">
+        <i class="fas fa-plus me-2"></i>Load More Reviews
+      </button>
+    </div>
+  </div>
 </div>
 
-<!-- Toast Container -->
-<div class="toast-container" id="toastContainer"></div>
+<!-- Review Detail Page -->
+<div id="reviewDetailPage" style="display: none;">
+  <button class="back-btn" onclick="showHomePage()">
+    <i class="fas fa-arrow-left"></i>
+  </button>
+  
+  <div class="container mt-5">
+    <div id="reviewDetailContent" class="review-detail">
+      <!-- Content will be populated by JavaScript -->
+    </div>
+  </div>
+</div>
 
-<!-- Login Modal -->
-<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-  <div class="modal-dialog modal-dialog-centered">
-    <form id="loginForm" class="modal-content needs-validation" novalidate>
-      <div class="modal-header text-center border-0">
-        <div class="w-100">
-          <h5 class="modal-title mb-0" id="loginModalLabel">
-            <i class="fas fa-film me-2"></i>CineReview CMS
-          </h5>
-          <small class="text-muted">Admin Panel Access</small>
-        </div>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-          <label for="loginEmail" class="form-label">Email</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-            <input type="email" id="loginEmail" class="form-control" required />
-          </div>
-          <div class="invalid-feedback">Please enter your email.</div>
-        </div>
-        <div class="mb-3">
-          <label for="loginPassword" class="form-label">Password</label>
-          <div class="input-group">
-            <span class="input-group-text"><i class="fas fa-lock"></i></span>
-            <input type="password" id="loginPassword" class="form-control" required />
-          </div>
-          <div class="invalid-feedback">Please enter your password.</div>
-        </div>
-      </div>
-      <div class="modal-footer border-0">
-        <button type="submit" class="btn btn-primary w-100" id="loginBtn">
-          <i class="fas fa-sign-in-alt me-2"></i>Login
+<!-- Admin Panel Iframe Container -->
+<div id="adminPanelPage" style="display: none;">
+  <div class="container-fluid mt-3">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+          <i class="fas fa-cog me-2"></i>Admin Panel
+        </h5>
+        <button class="btn btn-secondary btn-sm" onclick="showHomePage()">
+          <i class="fas fa-arrow-left me-2"></i>Back to Reviews
         </button>
       </div>
-    </form>
+      <div class="card-body p-0">
+        <div id="adminPanelContent" style="height: 80vh; overflow: auto;">
+          <!-- Admin panel will be loaded here -->
+        </div>
+      </div>
+    </div>
   </div>
+</div>
+
+<!-- API Status Indicator -->
+<div id="apiIndicator" class="api-indicator">
+  <i class="fas fa-circle me-2"></i>
+  <span id="apiStatus">Connecting...</span>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script>
-(() => {
-  // Configuration - Using JSONPlaceholder as working demo API
-  const CONFIG = {
-    API_BASE_URL: 'https://jsonplaceholder.typicode.com',
-    AUTH_TOKEN_KEY: 'cineAuthToken',
-    SETTINGS_KEY: 'cineSettings'
-  };
+// =================================
+// HEADLESS CMS BACKEND SIMULATION
+// =================================
 
-  let authToken = null;
-  let currentMovieId = null;
-  let movies = [];
-  let settings = {};
-
-  // API Helper Class
-  class ApiClient {
-    constructor(baseUrl) {
-      this.baseUrl = baseUrl;
-    }
-
-    async request(endpoint, options = {}) {
-      const url = `${this.baseUrl}${endpoint}`;
-      const config = {
-        headers: {
-          'Content-Type': 'application/json',
-          ...(authToken && { 'Authorization': `Bearer ${authToken.token}` }),
-          ...options.headers
-        },
-        ...options
-      };
-
-      try {
-        const response = await fetch(url, config);
-        
-        // Update connection status
-        updateConnectionStatus(true);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        return await response.json();
-      } catch (error) {
-        updateConnectionStatus(false);
-        console.error('API request failed:', error);
-        throw error;
-      }
-    }
-
-    // Movies endpoints using JSONPlaceholder
-    async getMovies() {
-      try {
-        const posts = await this.request('/posts');
-        return posts.slice(0, 20).map(post => this.transformPostToMovie(post));
-      } catch (error) {
-        console.error('Failed to fetch from API, using mock data:', error);
-        // Fallback to mock data if API fails
-        return this.getMockMovies();
-      }
-    }
-
-    transformPostToMovie(post) {
-      const genres = ['Drama', 'Action', 'Comedy', 'Horror', 'Sci-Fi', 'Thriller', 'Romance', 'Adventure'];
-      const reviewers = ['John Smith', 'Sarah Johnson', 'Mike Davis', 'Emma Wilson', 'David Brown'];
-      
-      return {
-        id: post.id,
-        title: this.titleCase(post.title.slice(0, 50)),
-        reviewer: reviewers[post.userId % reviewers.length],
-        genre: genres[post.id % genres.length],
-        rating: (7 + Math.random() * 3).toFixed(1), // Random rating between 7.0-10.0
-        year: 2015 + (post.id % 10),
-        status: post.id % 4 === 0 ? 'draft' : 'published',
-        posterUrl: `https://picsum.photos/300/450?random=${post.id}`,
-        views: Math.floor(Math.random() * 50000) + 1000,
-        likes: Math.floor(Math.random() * 5000) + 100,
-        createdAt: Date.now() - (post.id * 86400000),
-        publishedAt: post.id % 4 !== 0 ? new Date(Date.now() - (post.id * 86400000)).toISOString() : null
-      };
-    }
-
-    titleCase(str) {
-      return str.toLowerCase().split(' ').map(word => 
-        word.charAt(0).toUpperCase() + word.slice(1)
-      ).join(' ');
-    }
-
-    getMockMovies() {
-      const mockMovies = [
-        {
-          id: 1,
-          title: "The Shawshank Redemption",
-          reviewer: "Roger Ebert",
-          genre: "Drama",
-          rating: "9.3",
-          year: 1994,
-          status: "published",
-          posterUrl: "https://picsum.photos/300/450?random=1001",
-          views: 45230,
-          likes: 3420,
-          createdAt: Date.now() - 86400000,
-          publishedAt: new Date(Date.now() - 86400000).toISOString()
-        },
-        {
-          id: 2,
-          title: "The Godfather",
-          reviewer: "James Berardinelli",
-          genre: "Crime",
-          rating: "9.2",
-          year: 1972,
-          status: "published",
-          posterUrl: "https://picsum.photos/300/450?random=1002",
-          views: 38520,
-          likes: 2890,
-          createdAt: Date.now() - 172800000,
-          publishedAt: new Date(Date.now() - 172800000).toISOString()
-        },
-        {
-          id: 3,
-          title: "The Dark Knight",
-          reviewer: "Peter Travers",
-          genre: "Action",
-          rating: "9.0",
-          year: 2008,
-          status: "published",
-          posterUrl: "https://picsum.photos/300/450?random=1003",
-          views: 52100,
-          likes: 4150,
-          createdAt: Date.now() - 259200000,
-          publishedAt: new Date(Date.now() - 259200000).toISOString()
-        },
-        {
-          id: 4,
-          title: "Pulp Fiction",
-          reviewer: "Janet Maslin",
-          genre: "Crime",
-          rating: "8.9",
-          year: 1994,
-          status: "draft",
-          posterUrl: "https://picsum.photos/300/450?random=1004",
-          views: 0,
-          likes: 0,
-          createdAt: Date.now() - 345600000,
-          publishedAt: null
-        },
-        {
-          id: 5,
-          title: "Forrest Gump",
-          reviewer: "Leonard Maltin",
-          genre: "Drama",
-          rating: "8.8",
-          year: 1994,
-          status: "published",
-          posterUrl: "https://picsum.photos/300/450?random=1005",
-          views: 33400,
-          likes: 2580,
-          createdAt: Date.now() - 432000000,
-          publishedAt: new Date(Date.now() - 432000000).toISOString()
-        }
-      ];
-      
-      // Add more mock movies for demonstration
-      for (let i = 6; i <= 20; i++) {
-        mockMovies.push({
-          id: i,
-          title: `Sample Movie ${i}`,
-          reviewer: `Critic ${Math.ceil(i/3)}`,
-          genre: ['Drama', 'Comedy', 'Action', 'Horror', 'Sci-Fi'][i % 5],
-          rating: (7 + Math.random() * 3).toFixed(1),
-          year: 2015 + (i % 10),
-          status: i % 4 === 0 ? 'draft' : 'published',
-          posterUrl: `https://picsum.photos/300/450?random=${1000 + i}`,
-          views: Math.floor(Math.random() * 30000) + 500,
-          likes: Math.floor(Math.random() * 2000) + 50,
-          createdAt: Date.now() - (i * 86400000),
-          publishedAt: i % 4 !== 0 ? new Date(Date.now() - (i * 86400000)).toISOString() : null
-        });
-      }
-      
-      return mockMovies;
-    }
-
-    async getMovie(id) {
-      try {
-        const post = await this.request(`/posts/${id}`);
-        return this.transformPostToMovie(post);
-      } catch (error) {
-        // Return mock data if API fails
-        const mockMovie = this.getMockMovies().find(m => m.id === id);
-        if (mockMovie) return mockMovie;
-        throw error;
-      }
-    }
-
-    async createMovie(movieData) {
-      try {
-        const response = await this.request('/posts', {
-          method: 'POST',
-          body: JSON.stringify(movieData)
-        });
-        return { ...movieData, id: response.id || Date.now() };
-      } catch (error) {
-        // Simulate successful creation for demo
-        return { ...movieData, id: Date.now() };
-      }
-    }
-
-    async updateMovie(id, movieData) {
-      try {
-        await this.request(`/posts/${id}`, {
-          method: 'PUT',
-          body: JSON.stringify(movieData)
-        });
-        return { ...movieData, id };
-      } catch (error) {
-        // Simulate successful update for demo
-        return { ...movieData, id };
-      }
-    }
-
-    async deleteMovie(id) {
-      try {
-        await this.request(`/posts/${id}`, {
-          method: 'DELETE'
-        });
-        return { success: true };
-      } catch (error) {
-        // Simulate successful deletion for demo
-        return { success: true };
-      }
-    }
-
-    async login(credentials) {
-      // Simulate login - in real app, this would validate credentials
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-      
-      if (credentials.email && credentials.password) {
-        return {
-          token: 'fake-jwt-token-' + Date.now(),
-          user: {
-            email: credentials.email,
-            name: 'Admin User',
-            role: 'admin'
-          }
-        };
-      }
-      throw new Error('Invalid credentials');
-    }
-
-    async testConnection() {
-      try {
-        await this.request('/posts/1');
-        return { status: 'connected', message: 'API connection successful' };
-      } catch (error) {
-        return { status: 'error', message: error.message };
-      }
-    }
+class HeadlessCMS {
+  constructor() {
+    this.reviews = this.initializeReviews();
+    this.genres = [...new Set(this.reviews.map(r => r.genre))].sort();
   }
 
-  const api = new ApiClient(CONFIG.API_BASE_URL);
+  initializeReviews() {
+    return [
+      {
+        id: 1,
+        title: "The Shawshank Redemption",
+        reviewer: "Roger Ebert",
+        genre: "Drama",
+        rating: 9.3,
+        year: 1994,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1001",
+        views: 45230,
+        likes: 3420,
+        publishedAt: "2024-01-15T10:30:00Z",
+        summary: "A masterpiece of storytelling that transcends the prison genre to become something truly universal.",
+        fullReview: `Frank Darabont's adaptation of Stephen King's novella is nothing short of a masterpiece. The film follows Andy Dufresne (Tim Robbins), a banker wrongly convicted of murdering his wife and her lover, as he navigates life in Shawshank State Penitentiary.
 
-  // Helper Functions
-  function saveToken(token) {
-    authToken = token;
-    // Using variables instead of sessionStorage for demo compatibility
-    window.cineAuthToken = token;
+What makes this film extraordinary is its profound exploration of hope, friendship, and redemption. The relationship between Andy and Ellis "Red" Redding (Morgan Freeman) forms the emotional core of the story, developing naturally over the film's epic timeline.
+
+Tim Robbins delivers a nuanced performance as Andy, a man who maintains his dignity and hope despite twenty years of imprisonment. Freeman's narration provides the perfect storytelling voice, guiding us through this tale of resilience.
+
+The cinematography by Roger Deakins is breathtaking, particularly in the final sequence. Thomas Newman's score perfectly complements the emotional journey, never overpowering but always enhancing the narrative.
+
+This is filmmaking at its finest - a story that reminds us of the power of hope and the indomitable nature of the human spirit. The Shawshank Redemption stands as one of cinema's greatest achievements.`,
+        tags: ["prison", "friendship", "hope", "drama", "classic"]
+      },
+      {
+        id: 2,
+        title: "The Godfather",
+        reviewer: "Pauline Kael",
+        genre: "Crime",
+        rating: 9.2,
+        year: 1972,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1002",
+        views: 38520,
+        likes: 2890,
+        publishedAt: "2024-01-12T14:45:00Z",
+        summary: "Coppola's epic crime saga redefined what American cinema could achieve in terms of scope and character development.",
+        fullReview: `Francis Ford Coppola's The Godfather is not just a crime film; it's an American epic that redefined cinema. Based on Mario Puzo's novel, the film chronicles the transformation of Michael Corleone from war hero to ruthless crime boss.
+
+Marlon Brando's portrayal of Vito Corleone is iconic, bringing both gravitas and vulnerability to the role of the aging patriarch. Al Pacino's Michael undergoes one of cinema's most compelling character arcs, his transformation both gradual and shocking.
+
+The film's production design creates an immersive world of 1940s New York, from the opulent wedding sequence to the shadowy meeting rooms where life-and-death decisions are made. Gordon Willis's cinematography uses darkness and light to create visual poetry.
+
+What elevates The Godfather above typical genre fare is its exploration of family, tradition, and the corrupting nature of power. It's a film about the American Dream's dark underbelly, where success comes at the cost of one's soul.
+
+This is essential cinema - a film that operates simultaneously as entertainment and art, never sacrificing one for the other. The Godfather remains the gold standard for crime dramas.`,
+        tags: ["crime", "family", "power", "classic", "mafia"]
+      },
+      {
+        id: 3,
+        title: "The Dark Knight",
+        reviewer: "Peter Travers",
+        genre: "Action",
+        rating: 9.0,
+        year: 2008,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1003",
+        views: 52100,
+        likes: 4150,
+        publishedAt: "2024-01-10T09:15:00Z",
+        summary: "Nolan elevates the superhero genre with a complex moral tale anchored by Ledger's unforgettable Joker.",
+        fullReview: `Christopher Nolan's The Dark Knight transcends the superhero genre to become a profound meditation on chaos, order, and moral compromise. This is blockbuster filmmaking at its most intelligent and ambitious.
+
+Heath Ledger's Joker is a force of pure chaos, a performance so committed and terrifying that it redefined what a comic book villain could be. Ledger disappears completely into the role, creating something genuinely unsettling and magnetic.
+
+Christian Bale brings depth to Batman/Bruce Wayne, exploring the psychological toll of vigilantism. The supporting cast, including Gary Oldman as Commissioner Gordon and Aaron Eckhart as Harvey Dent, provides strong dramatic anchors.
+
+Nolan's direction is masterful, balancing spectacular action sequences with intimate character moments. The film's exploration of surveillance, terrorism, and moral boundaries feels remarkably relevant.
+
+The Dark Knight proves that superhero films can tackle serious themes without losing their entertainment value. It's a rare blockbuster that respects its audience's intelligence while delivering thrilling spectacle.
+
+This is how you elevate genre material - through strong characters, thematic depth, and uncompromising filmmaking vision.`,
+        tags: ["superhero", "action", "psychological", "thriller", "batman"]
+      },
+      {
+        id: 4,
+        title: "Pulp Fiction",
+        reviewer: "Janet Maslin",
+        genre: "Crime",
+        rating: 8.9,
+        year: 1994,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1004",
+        views: 41200,
+        likes: 3100,
+        publishedAt: "2024-01-08T16:20:00Z",
+        summary: "Tarantino's nonlinear masterpiece revolutionized independent cinema with its bold narrative structure.",
+        fullReview: `Quentin Tarantino's Pulp Fiction is a tour de force of postmodern filmmaking that revolutionized independent cinema. The film's non-linear narrative structure was groundbreaking, influencing countless filmmakers who followed.
+
+The interwoven stories of hitmen Vincent Vega (John Travolta) and Jules Winnfield (Samuel L. Jackson), boxer Butch Coolidge (Bruce Willis), and crime boss Marsellus Wallace (Ving Rhames) create a rich tapestry of Los Angeles underground life.
+
+Tarantino's dialogue is razor-sharp, mixing profound philosophical discussions with pop culture references and dark humor. The performances are uniformly excellent, with Jackson delivering some of cinema's most quotable lines.
+
+The film's structure mirrors its themes of redemption and chance. Characters' fates intertwine in unexpected ways, suggesting that redemption is always possible, even in the darkest circumstances.
+
+Pulp Fiction's influence on popular culture cannot be overstated. It revitalized John Travolta's career, launched Jackson into superstardom, and proved that audiences were hungry for intelligent, challenging cinema.
+
+This is filmmaking that respects its audience's intelligence while delivering pure entertainment. Pulp Fiction remains a landmark achievement in American cinema.`,
+        tags: ["crime", "nonlinear", "indie", "dialogue", "cult classic"]
+      },
+      {
+        id: 5,
+        title: "Forrest Gump",
+        reviewer: "Leonard Maltin",
+        genre: "Drama",
+        rating: 8.8,
+        year: 1994,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1005",
+        views: 33400,
+        likes: 2580,
+        publishedAt: "2024-01-05T11:45:00Z",
+        summary: "Zemeckis crafts a heartwarming journey through American history with Tom Hanks at his most endearing.",
+        fullReview: `Robert Zemeckis's Forrest Gump is a remarkable journey through four decades of American history, seen through the eyes of an unlikely protagonist. Tom Hanks delivers one of his finest performances as the title character, bringing warmth and authenticity to this simple man with an extraordinary life.
+
+The film's technical achievements are stunning, seamlessly integrating Forrest into historical footage and creating believable interactions with past presidents and cultural figures. The visual effects serve the story rather than overwhelming it.
+
+What could have been mere gimmickry becomes something profound in Zemeckis's hands. Forrest's journey from rural Alabama to national fame touches on major historical events while maintaining focus on personal relationships and individual growth.
+
+Jenny (Robin Wright) and Lieutenant Dan (Gary Sinise) represent different aspects of the American experience, their relationships with Forrest exploring themes of love, loss, and redemption.
+
+The film's message about destiny versus choice resonates throughout, suggesting that life is both predetermined and full of infinite possibilities. Alan Silvestri's score perfectly captures the film's emotional journey.
+
+Forrest Gump succeeds because it never condescends to its audience or its characters. It's a film that finds profound truth in simplicity.`,
+        tags: ["drama", "historical", "heartwarming", "american", "classic"]
+      },
+      {
+        id: 6,
+        title: "Inception",
+        reviewer: "A.O. Scott",
+        genre: "Sci-Fi",
+        rating: 8.7,
+        year: 2010,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1006",
+        views: 48900,
+        likes: 3800,
+        publishedAt: "2024-01-03T13:30:00Z",
+        summary: "Nolan's mind-bending heist film operates on multiple levels of reality with stunning visual complexity.",
+        fullReview: `Christopher Nolan's Inception is a labyrinthine masterpiece that operates on multiple levels - literally and figuratively. This film about entering dreams to steal secrets pushes the boundaries of what blockbuster cinema can achieve intellectually.
+
+Leonardo DiCaprio anchors the film as Dom Cobb, a man haunted by guilt and desperate to return to his children. The supporting cast, including Marion Cotillard, Tom Hardy, and Ellen Page, brings depth to what could have been merely functional roles.
+
+The film's exploration of dreams within dreams creates a complex narrative structure that rewards careful attention. Nolan trusts his audience to follow intricate plotting while delivering spectacular action sequences.
+
+The practical effects and cinematography create genuinely awe-inspiring moments - the famous rotating hallway fight sequence is a masterclass in choreography and technical achievement.
+
+Hans Zimmer's booming score perfectly complements the film's epic scope and emotional core. The music becomes another character in the story, driving the narrative forward.
+
+Inception succeeds as both intellectual puzzle and emotional journey. It's a film that reveals new layers on repeated viewings, proving that audiences crave challenging, original content.`,
+        tags: ["sci-fi", "dreams", "heist", "complex", "mind-bending"]
+      },
+      {
+        id: 7,
+        title: "Goodfellas",
+        reviewer: "Vincent Canby",
+        genre: "Crime",
+        rating: 8.6,
+        year: 1990,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1007",
+        views: 35600,
+        likes: 2750,
+        publishedAt: "2024-01-01T15:00:00Z",
+        summary: "Scorsese's kinetic crime epic captures the seductive allure and ultimate emptiness of mob life.",
+        fullReview: `Martin Scorsese's Goodfellas is a kinetic masterpiece that captures both the seductive allure and ultimate emptiness of organized crime. Based on Nicholas Pileggi's non-fiction book, the film follows Henry Hill's rise and fall in the Lucchese crime family.
+
+Ray Liotta gives a career-defining performance as Henry, guiding us through thirty years of mob life with infectious enthusiasm that gradually turns to paranoid desperation. Robert De Niro and Joe Pesci provide unforgettable support as career criminals with their own moral codes.
+
+Scorsese's direction is electric, using freeze frames, voice-over, and popular music to create an intoxicating rhythm. The famous Copacabana tracking shot is a technical marvel that serves the story's themes about access and privilege.
+
+The film doesn't romanticize mob life - it shows how the glamour masks a world of violence, paranoia, and inevitable betrayal. The lifestyle that seems so appealing in the first half becomes a nightmare in the second.
+
+Thelma Schoonmaker's editing creates a pace that mirrors Henry's drug-fueled paranoia, particularly in the famous "day of the bust" sequence. The film's structure mirrors addiction itself.
+
+Goodfellas stands as perhaps the definitive crime film, capturing the psychology of organized crime with unflinching honesty and masterful filmmaking technique.`,
+        tags: ["crime", "mafia", "biographical", "scorsese", "classic"]
+      },
+      {
+        id: 8,
+        title: "The Lord of the Rings: The Return of the King",
+        reviewer: "Peter Jackson",
+        genre: "Fantasy",
+        rating: 8.9,
+        year: 2003,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1008",
+        views: 67800,
+        likes: 5200,
+        publishedAt: "2023-12-28T12:00:00Z",
+        summary: "Jackson's epic conclusion delivers emotional satisfaction and spectacular action in equal measure.",
+        fullReview: `Peter Jackson's The Return of the King brings J.R.R. Tolkien's epic trilogy to a spectacular and emotionally satisfying conclusion. This is filmmaking on the grandest scale, yet it never loses sight of the intimate human stories at its heart.
+
+The film's multiple climaxes could feel excessive, but Jackson orchestrates them with such skill that each feels necessary and earned. From the Battle of Pelennor Fields to the destruction of the Ring, every sequence builds to maximum emotional impact.
+
+The performances remain strong throughout the extended running time. Viggo Mortensen's Aragorn completes his journey from ranger to king, while Sean Bean and John Noble provide powerful dramatic anchors as Denethor spirals into madness.
+
+The production design and visual effects create a believable fantasy world that feels lived-in and authentic. The attention to detail in costumes, sets, and creature design is extraordinary.
+
+Howard Shore's score reaches its emotional peak here, weaving together musical themes from the entire trilogy into a powerful symphony that enhances every moment.
+
+The Return of the King succeeds as both epic spectacle and intimate character study. It's a worthy conclusion to one of cinema's greatest achievements, proving that blockbuster entertainment and artistic ambition can coexist.`,
+        tags: ["fantasy", "epic", "adventure", "trilogy", "tolkien"]
+      },
+      {
+        id: 9,
+        title: "Schindler's List",
+        reviewer: "David Ansen",
+        genre: "Drama",
+        rating: 8.9,
+        year: 1993,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1009",
+        views: 29300,
+        likes: 2100,
+        publishedAt: "2023-12-25T08:30:00Z",
+        summary: "Spielberg's powerful Holocaust drama finds hope and humanity in history's darkest chapter.",
+        fullReview: `Steven Spielberg's Schindler's List is a profound and necessary film that confronts the Holocaust with unflinching honesty while finding glimmers of hope in humanity's darkest hour. This is Spielberg at his most serious and accomplished.
+
+Liam Neeson gives the performance of his career as Oskar Schindler, a German industrialist who saved over 1,000 Jewish lives. Neeson captures Schindler's complexity - a man whose motivations evolve from profit to genuine human compassion.
+
+Ralph Fiennes is terrifyingly effective as Amon Goeth, the sadistic SS officer who serves as Schindler's moral opposite. Ben Kingsley provides quiet dignity as Itzhak Stern, Schindler's Jewish accountant and moral compass.
+
+Janusz Kaminski's black-and-white cinematography creates a documentary-like authenticity while the selective use of color - particularly the little girl in the red coat - provides moments of devastating emotional impact.
+
+John Williams's restrained score avoids melodrama, instead providing a mournful beauty that honors the victims while supporting the narrative's emotional weight.
+
+Schindler's List succeeds because it personalizes an incomprehensible tragedy. By focusing on one man's journey from indifference to heroism, Spielberg makes the Holocaust's horror comprehensible and its lessons urgent.
+
+This is cinema as moral imperative - a film that demands to be seen and remembered.`,
+        tags: ["holocaust", "historical", "drama", "heroism", "spielberg"]
+      },
+      {
+        id: 10,
+        title: "12 Angry Men",
+        reviewer: "Bosley Crowther",
+        genre: "Drama",
+        rating: 8.9,
+        year: 1957,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1010",
+        views: 22400,
+        likes: 1800,
+        publishedAt: "2023-12-20T10:15:00Z",
+        summary: "Lumet's courtroom drama is a masterclass in tension and social commentary.",
+        fullReview: `Sidney Lumet's 12 Angry Men is a masterclass in filmmaking economy and social commentary. Set almost entirely in one room, the film follows twelve jurors deliberating a murder case that initially seems open-and-shut.
+
+Henry Fonda delivers a powerhouse performance as Juror #8, the lone holdout who forces his fellow jurors to examine their prejudices and assumptions. The supporting cast creates distinct, memorable characters despite limited screen time.
+
+Lumet's direction builds tension masterfully through cinematography and staging. As the deliberation intensifies, the camera moves closer to the characters and the room feels increasingly claustrophobic.
+
+The film's exploration of justice, prejudice, and civic responsibility remains powerfully relevant. Each juror represents different aspects of American society, their biases reflecting broader social issues.
+
+What makes 12 Angry Men extraordinary is its faith in reasoned discourse and democratic principles. In an era of increasing polarization, the film's message about listening and empathy feels essential.
+
+This is cinema at its most essential - proving that great filmmaking doesn't require elaborate sets or special effects, just compelling characters and important ideas.`,
+        tags: ["courtroom", "justice", "social commentary", "classic", "ensemble"]
+      },
+      {
+        id: 11,
+        title: "Fight Club",
+        reviewer: "David Fincher",
+        genre: "Thriller",
+        rating: 8.8,
+        year: 1999,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1011",
+        views: 55600,
+        likes: 4300,
+        publishedAt: "2023-12-18T14:30:00Z",
+        summary: "Fincher's dark satire of consumer culture and masculinity remains provocatively relevant.",
+        fullReview: `David Fincher's Fight Club is a darkly satirical masterpiece that dissects consumer culture and toxic masculinity with surgical precision. Based on Chuck Palahniuk's novel, the film follows an unnamed narrator's descent into anarchic rebellion.
+
+Edward Norton delivers a complex performance as the insomniac narrator trapped in corporate drudgery. Brad Pitt's Tyler Durden embodies charismatic nihilism, representing everything the narrator wishes he could be.
+
+Helena Bonham Carter's Marla Singer provides the film's emotional core, a damaged woman who sees through both men's facades. The love triangle becomes a commentary on authentic connection in an alienated world.
+
+Fincher's direction is meticulous, using innovative visual effects and cinematography to blur the line between reality and delusion. The film's twist recontextualizes everything that came before.
+
+The critique of consumer culture feels more relevant than ever, as does the exploration of how alienated men can be radicalized. Fight Club predicted many aspects of contemporary social media culture.
+
+This is provocative filmmaking that refuses easy answers. Fight Club challenges viewers to examine their own complicity in systems they claim to reject. It's cinema as philosophical bomb.`,
+        tags: ["psychological", "satire", "consumer culture", "masculinity", "twist"]
+      },
+      {
+        id: 12,
+        title: "The Matrix",
+        reviewer: "Roger Ebert",
+        genre: "Sci-Fi",
+        rating: 8.7,
+        year: 1999,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1012",
+        views: 61200,
+        likes: 4900,
+        publishedAt: "2023-12-15T16:45:00Z",
+        summary: "The Wachowskis create a revolutionary sci-fi action film that redefined visual effects and philosophical blockbusters.",
+        fullReview: `The Wachowski Sisters' The Matrix revolutionized both science fiction and action cinema, creating a new template for philosophical blockbusters. The film's exploration of reality, consciousness, and control remains remarkably prescient.
+
+Keanu Reeves brings the perfect combination of vulnerability and determination to Neo, a hacker who discovers reality is a computer simulation. Laurence Fishburne's Morpheus serves as both mentor and prophet, while Carrie-Anne Moss's Trinity provides fierce intelligence and emotional grounding.
+
+The film's action sequences, particularly the "bullet time" effects, were groundbreaking. But these innovations serve the story's themes about perception and reality rather than existing for their own sake.
+
+The philosophical underpinnings draw from sources ranging from Plato's Cave to Buddhist concepts of illusion. These ideas are woven seamlessly into the narrative without becoming heavy-handed.
+
+The production design creates a distinctive visual language - the contrast between the green-tinted Matrix and the harsh reality of Zion reinforces the film's thematic concerns.
+
+The Matrix succeeds because it takes its ideas seriously while delivering spectacular entertainment. It's a film that works on multiple levels - as action movie, philosophical meditation, and cultural phenomenon.
+
+This is how you make intelligent blockbuster cinema - by respecting both the genre and the audience.`,
+        tags: ["sci-fi", "action", "philosophical", "virtual reality", "revolutionary"]
+      },
+      {
+        id: 13,
+        title: "Goodfellas",
+        reviewer: "Pauline Kael",
+        genre: "Crime",
+        rating: 8.6,
+        year: 1990,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1013",
+        views: 39800,
+        likes: 3200,
+        publishedAt: "2023-12-12T09:20:00Z",
+        summary: "Scorsese's kinetic crime epic captures the seductive allure and ultimate emptiness of mob life.",
+        fullReview: `Martin Scorsese's Goodfellas is a kinetic masterpiece that captures both the seductive allure and ultimate emptiness of organized crime. Based on Nicholas Pileggi's non-fiction book, the film follows Henry Hill's rise and fall in the Lucchese crime family.
+
+Ray Liotta gives a career-defining performance as Henry, guiding us through thirty years of mob life with infectious enthusiasm that gradually turns to paranoid desperation. Robert De Niro and Joe Pesci provide unforgettable support as career criminals with their own moral codes.
+
+Scorsese's direction is electric, using freeze frames, voice-over, and popular music to create an intoxicating rhythm. The famous Copacabana tracking shot is a technical marvel that serves the story's themes about access and privilege.
+
+The film doesn't romanticize mob life - it shows how the glamour masks a world of violence, paranoia, and inevitable betrayal. The lifestyle that seems so appealing in the first half becomes a nightmare in the second.
+
+Thelma Schoonmaker's editing creates a pace that mirrors Henry's drug-fueled paranoia, particularly in the famous "day of the bust" sequence. The film's structure mirrors addiction itself.
+
+Goodfellas stands as perhaps the definitive crime film, capturing the psychology of organized crime with unflinching honesty and masterful filmmaking technique.`,
+        tags: ["crime", "mafia", "biographical", "scorsese", "kinetic"]
+      },
+      {
+        id: 14,
+        title: "The Silence of the Lambs",
+        reviewer: "Janet Maslin",
+        genre: "Thriller",
+        rating: 8.6,
+        year: 1991,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1014",
+        views: 43500,
+        likes: 3400,
+        publishedAt: "2023-12-10T11:30:00Z",
+        summary: "Demme's psychological thriller creates genuine terror through character development and atmosphere.",
+        fullReview: `Jonathan Demme's The Silence of the Lambs transcends the thriller genre to become a profound character study wrapped in a genuinely terrifying package. The film's exploration of good and evil, hunter and hunted, remains unmatched in its psychological complexity.
+
+Jodie Foster delivers a powerhouse performance as Clarice Starling, an FBI trainee whose strength comes from vulnerability rather than traditional toughness. Foster makes Clarice's determination to prove herself completely believable.
+
+Anthony Hopkins's Hannibal Lecter is one of cinema's greatest villains - intelligent, cultured, and absolutely terrifying. Hopkins brings an almost supernatural presence to the role, making Lecter simultaneously fascinating and repulsive.
+
+The film's feminist subtext is crucial - Clarice navigates a male-dominated world while hunting a killer who targets women. Her relationship with Lecter becomes a twisted form of mentorship.
+
+Demme's direction emphasizes faces and eyes, creating intimacy that makes the horror more personal. The famous point-of-view shots put viewers directly in Clarice's position.
+
+Howard Shore's minimalist score enhances the film's atmosphere without overwhelming the psychological realism. Every element serves the story's exploration of human nature's dark corners.
+
+The Silence of the Lambs proves that horror can be intelligent and meaningful without sacrificing effectiveness. It remains the gold standard for psychological thrillers.`,
+        tags: ["thriller", "psychological", "horror", "fbi", "serial killer"]
+      },
+      {
+        id: 15,
+        title: "Casablanca",
+        reviewer: "James Agee",
+        genre: "Romance",
+        rating: 8.5,
+        year: 1942,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1015",
+        views: 28900,
+        likes: 2300,
+        publishedAt: "2023-12-08T13:45:00Z",
+        summary: "Curtiz's wartime romance remains Hollywood's most perfect synthesis of entertainment and art.",
+        fullReview: `Michael Curtiz's Casablanca represents Hollywood's Golden Age at its absolute peak. This wartime romance operates on multiple levels - as love story, political allegory, and masterclass in studio system filmmaking.
+
+Humphrey Bogart's Rick Blaine is the perfect anti-hero - cynical yet romantic, selfish yet ultimately noble. Ingrid Bergman's Ilsa embodies the film's central conflict between love and duty, while Paul Henreid's Victor Laszlo represents idealistic resistance.
+
+The supporting cast creates a rich ensemble of refugees, resistance fighters, and opportunists. Claude Rains's Captain Renault provides both comic relief and moral complexity, while Sydney Greenstreet and Peter Lorre add texture to Rick's world.
+
+The film's dialogue has entered the cultural lexicon - lines like "Here's looking at you, kid" and "Play it again, Sam" (though the latter is misquoted) have become part of American mythology.
+
+Arthur Edeson's cinematography and Owen Marks's editing create a dreamlike quality that enhances the film's romantic atmosphere. Max Steiner's score, particularly "As Time Goes By," provides perfect emotional support.
+
+Casablanca endures because it balances cynicism with romanticism, entertainment with meaning. It's a film that satisfies on every level - emotional, intellectual, and aesthetic.
+
+This is Hollywood storytelling at its most sophisticated and enduring.`,
+        tags: ["romance", "wartime", "classic", "hollywood", "golden age"]
+      },
+      {
+        id: 16,
+        title: "Citizen Kane",
+        reviewer: "Pauline Kael",
+        genre: "Drama",
+        rating: 8.3,
+        year: 1941,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1016",
+        views: 31200,
+        likes: 2500,
+        publishedAt: "2023-12-05T15:20:00Z",
+        summary: "Welles's debut remains a technical and narrative masterpiece that redefined cinematic possibility.",
+        fullReview: `Orson Welles's Citizen Kane stands as perhaps the most influential film in cinema history, a technical and narrative masterpiece that redefined what movies could achieve artistically. Welles's debut as director remains remarkably fresh and innovative.
+
+The film's exploration of Charles Foster Kane's rise and fall serves as both character study and critique of American ambition. Welles's performance captures Kane's complexity - his charisma, megalomania, and ultimate loneliness.
+
+The supporting cast, including Joseph Cotten, Dorothy Comingore, and Agnes Moorehead, brings depth to what could have been merely symbolic roles. Each relationship reveals different aspects of Kane's character.
+
+Gregg Toland's deep-focus cinematography was revolutionary, allowing foreground and background action to remain in sharp focus simultaneously. This technique serves the story's themes about perspective and truth.
+
+The narrative structure, told through flashbacks and multiple perspectives, influenced countless films that followed. The mystery of "Rosebud" provides emotional resonance to Kane's epic story.
+
+Herman J. Mankiewicz and Welles's screenplay layers social commentary with personal drama, creating a work that operates as both entertainment and serious art.
+
+Citizen Kane's influence extends far beyond its initial reception. It proved that American cinema could match European art films in sophistication while maintaining popular appeal.
+
+This is filmmaking as high art - ambitious, innovative, and endlessly rewarding.`,
+        tags: ["classic", "innovative", "american dream", "power", "masterpiece"]
+      },
+      {
+        id: 17,
+        title: "Parasite",
+        reviewer: "A.O. Scott",
+        genre: "Thriller",
+        rating: 8.6,
+        year: 2019,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1017",
+        views: 58700,
+        likes: 4600,
+        publishedAt: "2023-12-03T12:10:00Z",
+        summary: "Bong Joon-ho's class warfare thriller is a masterful blend of dark comedy and social commentary.",
+        fullReview: `Bong Joon-ho's Parasite is a masterful thriller that uses genre conventions to explore class warfare with devastating effectiveness. This film operates simultaneously as dark comedy, horror, and social commentary without ever feeling scattered.
+
+Song Kang-ho anchors the film as Ki-taek, the patriarch of a family living in poverty who infiltrates a wealthy household. The entire cast delivers nuanced performances that avoid caricature despite the film's satirical elements.
+
+The production design is crucial to the film's success - the contrast between the Kim family's semi-basement apartment and the Park family's modernist mansion becomes a character in itself.
+
+Bong's direction masterfully controls tone, shifting from comedy to horror without jarring transitions. The film's second half revelation recontextualizes everything that came before, revealing deeper layers of class conflict.
+
+The cinematography by Hong Kyung-pyo uses vertical movement and architectural spaces to reinforce themes about social hierarchy. Every visual choice serves the story's exploration of inequality.
+
+Jung Jae-il's score provides an unsettling undercurrent that enhances the film's growing sense of dread. The music never telegraphs the horror, instead building tension subtly.
+
+Parasite succeeds because it makes universal themes specific to Korean society while remaining globally relevant. This is filmmaking that entertains while providing genuine insight into contemporary social issues.`,
+        tags: ["thriller", "social commentary", "class warfare", "korean", "dark comedy"]
+      },
+      {
+        id: 18,
+        title: "Spirited Away",
+        reviewer: "Roger Ebert",
+        genre: "Animation",
+        rating: 8.6,
+        year: 2001,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1018",
+        views: 47300,
+        likes: 3900,
+        publishedAt: "2023-12-01T10:45:00Z",
+        summary: "Miyazaki's animated masterpiece creates a magical world that speaks to universal themes of growth and identity.",
+        fullReview: `Hayao Miyazaki's Spirited Away is a masterpiece of animation that creates a fully realized fantasy world while exploring universal themes of identity, growth, and environmental responsibility. This is Studio Ghibli at its absolute peak.
+
+The story follows Chihiro, a ten-year-old girl who must rescue her parents after they're transformed into pigs in a magical spirit world. Rumi Hiiragi's voice performance captures Chihiro's journey from spoiled child to courageous young woman.
+
+The supporting characters are unforgettable - from the mysterious No-Face to the dragon Haku, each spirit represents different aspects of human nature and Japanese folklore. The bathhouse setting creates a perfect microcosm for exploring social dynamics.
+
+Miyazaki's hand-drawn animation is breathtakingly beautiful, creating textures and movements that computer animation has yet to match. Every frame is filled with imaginative details that reward multiple viewings.
+
+The film's environmental themes are woven naturally into the narrative without becoming preachy. The polluted river spirit sequence serves as both thrilling set piece and powerful metaphor.
+
+Joe Hisaishi's score perfectly complements Miyazaki's vision, creating musical themes that enhance the magical atmosphere while supporting emotional moments.
+
+Spirited Away proves that animation can tackle serious themes while maintaining wonder and joy. It's a film that speaks to children and adults equally, offering different layers of meaning for different ages.
+
+This is animation as high art - imaginative, meaningful, and absolutely enchanting.`,
+        tags: ["animation", "fantasy", "coming of age", "environmental", "japanese"]
+      },
+      {
+        id: 19,
+        title: "Vertigo",
+        reviewer: "Andrew Sarris",
+        genre: "Thriller",
+        rating: 8.3,
+        year: 1958,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1019",
+        views: 26700,
+        likes: 2100,
+        publishedAt: "2023-11-28T14:15:00Z",
+        summary: "Hitchcock's psychological masterpiece explores obsession and identity with unprecedented visual sophistication.",
+        fullReview: `Alfred Hitchcock's Vertigo is a psychological masterpiece that explores obsession, identity, and the male gaze with unprecedented sophistication. Initially dismissed by critics, the film has grown in stature to be considered Hitchcock's greatest achievement.
+
+James Stewart delivers one of his darkest performances as Scottie Ferguson, a detective whose acrophobia leads to tragedy and obsession. Stewart's likeable persona makes Scottie's descent into manipulation even more disturbing.
+
+Kim Novak gives a complex dual performance as Madeleine/Judy, a woman trapped in male fantasies of feminine perfection. Her portrayal captures both the character's victimization and her attempts at agency.
+
+Robert Burks's cinematography uses color and composition to create a dreamlike atmosphere that reflects Scottie's fractured psychology. The famous dolly zoom effect became a cinematic landmark.
+
+Bernard Herrmann's score is one of cinema's greatest achievements, using musical themes to represent psychological states. The swirling, obsessive melodies mirror Scottie's mental state.
+
+The film's exploration of male objectification of women was ahead of its time, critiquing the very behavior it depicts. Hitchcock implicates both Scottie and the audience in voyeuristic complicity.
+
+Vertigo operates as both psychological study and technical showcase. It's a film that reveals new depths with each viewing, cementing its status as a true cinematic masterpiece.`,
+        tags: ["psychological", "obsession", "hitchcock", "thriller", "masterpiece"]
+      },
+      {
+        id: 20,
+        title: "Apocalypse Now",
+        reviewer: "Vincent Canby",
+        genre: "War",
+        rating: 8.4,
+        year: 1979,
+        status: "published",
+        posterUrl: "https://picsum.photos/300/450?random=1020",
+        views: 34500,
+        likes: 2800,
+        publishedAt: "2023-11-25T16:30:00Z",
+        summary: "Coppola's Vietnam War epic is a hallucinogenic journey into the heart of darkness and human nature.",
+        fullReview: `Francis Ford Coppola's Apocalypse Now is a hallucinogenic masterpiece that uses the Vietnam War as a backdrop for exploring the darkest aspects of human nature. Based loosely on Joseph Conrad's "Heart of Darkness," the film is both war movie and philosophical journey.
+
+Martin Sheen delivers a committed performance as Captain Willard, sent on a secret mission to assassinate the rogue Colonel Kurtz. Sheen's physical and emotional commitment to the role anchors the film's surreal journey.
+
+Marlon Brando's Kurtz appears only in the final act, but his presence looms over the entire film. Brando's improvised performance creates a character both fascinating and terrifying, representing the logical endpoint of unchecked power.
+
+The supporting cast, including Robert Duvall's memorable Lieutenant Colonel Kilgore, creates a gallery of men broken or corrupted by war. Each encounter deepens the film's exploration of violence and civilization.
+
+Vittorio Storaro's cinematography creates a visual poem of war's beauty and horror. The famous helicopter attack sequence, set to Wagner's "Ride of the Valkyries," is both thrilling and deeply disturbing.
+
+The film's production became legendary for its difficulties, but these challenges served the story's themes about ambition and madness. Coppola's personal journey mirrors Willard's mission.
+
+Apocalypse Now succeeds as both spectacular war film and profound meditation on power, violence, and the thin line between civilization and savagery.`,
+        tags: ["war", "vietnam", "psychological", "epic", "coppola"]
+      }
+    ];
   }
 
-  function loadToken() {
-    // Check if token exists in memory
-    if (window.cineAuthToken) {
-      authToken = window.cineAuthToken;
-      return true;
-    }
-    return false;
+  // REST API Methods
+  async getAllReviews() {
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 1000 + 500));
+    return this.reviews.filter(r => r.status === 'published');
   }
 
-  function loadSettings() {
-    // Using in-memory storage for demo compatibility
-    if (!window.cineSettings) {
-      window.cineSettings = {
-        adminEmail: 'admin@cinereview.com',
-        siteTitle: 'CineReview CMS',
-        apiEndpoint: CONFIG.API_BASE_URL
-      };
-    }
-    settings = window.cineSettings;
-    return settings;
-  }
-
-  function saveSettings(newSettings) {
-    settings = { ...settings, ...newSettings };
-    window.cineSettings = settings;
-  }
-
-  function updateConnectionStatus(isConnected) {
-    const indicator = document.getElementById('connectionStatus');
-    indicator.className = `status-indicator ${isConnected ? '' : 'offline'}`;
-    indicator.title = isConnected ? 'API Connected' : 'API Disconnected';
-  }
-
-  // UI Functions
-  function showPage(page) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    const el = document.getElementById(page + '-page');
-    if (el) el.classList.add('active');
-
-    document.querySelectorAll('#sidebar .nav-link').forEach(link => {
-      link.classList.toggle('active', link.dataset.page === page);
-    });
-
-    document.getElementById('pageTitle').textContent = {
-      dashboard: 'Dashboard',
-      movies: 'Manage Movies',
-      'add-movie': 'Add New Movie',
-      settings: 'Settings'
-    }[page] || '';
-
-    // Load page-specific data
-    switch (page) {
-      case 'dashboard':
-        loadDashboard();
-        break;
-      case 'movies':
-        loadMovies();
-        break;
-      case 'add-movie':
-        resetMovieForm();
-        break;
-      case 'settings':
-        loadSettingsForm();
-        break;
-    }
-  }
-
-  function showToast(message, type = 'success') {
-    const container = document.getElementById('toastContainer');
-    const toastId = 'toast-' + Date.now();
-    const toast = document.createElement('div');
-    toast.id = toastId;
-    toast.className = `toast align-items-center text-bg-${type} border-0 show shadow`;
-    toast.setAttribute('role', 'alert');
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
+  async getReviewById(id) {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const review = this.reviews.find(r => r.id === parseInt(id));
+    if (!review) throw new Error('Review not found');
     
-    const iconMap = {
-      success: 'fas fa-check-circle',
-      danger: 'fas fa-exclamation-triangle',
-      warning: 'fas fa-exclamation-circle',
-      info: 'fas fa-info-circle'
-    };
+    // Increment view count
+    review.views += 1;
+    return review;
+  }
+
+  async searchReviews(query, genre = '', sortBy = 'rating-desc') {
+    await new Promise(resolve => setTimeout(resolve, 400));
     
-    toast.innerHTML = `
-      <div class="d-flex">
-        <div class="toast-body">
-          <i class="${iconMap[type]} me-2"></i>${escapeHtml(message)}
-        </div>
-        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-      </div>
-    `;
+    let results = this.reviews.filter(r => r.status === 'published');
     
-    container.appendChild(toast);
-    
-    setTimeout(() => {
-      const toastElement = document.getElementById(toastId);
-      if (toastElement) {
-        toastElement.classList.remove('show');
-        setTimeout(() => toastElement.remove(), 300);
-      }
-    }, 5000);
-  }
-
-  function showLoading(elementId, show = true) {
-    const element = document.getElementById(elementId);
-    if (element) {
-      element.style.display = show ? 'block' : 'none';
-    }
-  }
-
-  function setLoadingButton(buttonId, loading = true) {
-    const button = document.getElementById(buttonId);
-    if (button) {
-      button.disabled = loading;
-      if (loading) {
-        button.dataset.originalText = button.innerHTML;
-        button.innerHTML = '<span class="loading-spinner me-2"></span>Loading...';
-      } else {
-        button.innerHTML = button.dataset.originalText || button.innerHTML;
-      }
-    }
-  }
-
-  function escapeHtml(text) {
-    if (!text) return '';
-    return text.toString().replace(/[&<>"']/g, m => {
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
-    });
-  }
-
-  function formatNumber(num) {
-    return new Intl.NumberFormat().format(num || 0);
-  }
-
-  function formatDate(dateStr) {
-    if (!dateStr) return 'Not published';
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    }).format(new Date(dateStr));
-  }
-
-  // Dashboard Functions
-  async function loadDashboard() {
-    try {
-      if (movies.length === 0) {
-        movies = await api.getMovies();
-      }
-      
-      const totalMovies = movies.length;
-      const publishedMovies = movies.filter(m => m.status === 'published').length;
-      const totalViews = movies.reduce((sum, movie) => sum + (movie.views || 0), 0);
-      const totalLikes = movies.reduce((sum, movie) => sum + (movie.likes || 0), 0);
-
-      document.getElementById('totalMoviesCount').textContent = formatNumber(totalMovies);
-      document.getElementById('publishedMoviesCount').textContent = formatNumber(publishedMovies);
-      document.getElementById('totalViewsCount').textContent = formatNumber(totalViews);
-      document.getElementById('totalLikesCount').textContent = formatNumber(totalLikes);
-
-      // Recent movies table
-      const recentMovies = [...movies]
-        .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-        .slice(0, 5);
-        
-      const tbody = document.getElementById('recentMoviesTable');
-      tbody.innerHTML = recentMovies.length === 0 
-        ? '<tr><td colspan="6" class="text-center text-muted py-4">No movies found</td></tr>'
-        : recentMovies.map(movie => `
-          <tr>
-            <td><strong>${escapeHtml(movie.title)}</strong></td>
-            <td><span class="badge bg-secondary">${escapeHtml(movie.genre)}</span></td>
-            <td><span class="text-warning"><i class="fas fa-star"></i> ${movie.rating}/10</span></td>
-            <td><span class="badge bg-${movie.status === 'published' ? 'success' : 'warning'}">${escapeHtml(movie.status)}</span></td>
-            <td><i class="fas fa-eye me-1"></i>${formatNumber(movie.views)}</td>
-            <td>${formatDate(movie.publishedAt)}</td>
-          </tr>
-        `).join('');
-        
-    } catch (error) {
-      console.error('Failed to load dashboard:', error);
-      showToast('Failed to load dashboard data', 'danger');
-    }
-  }
-
-  // Movies Functions
-  async function loadMovies() {
-    try {
-      showLoading('moviesLoading', true);
-      movies = await api.getMovies();
-      renderMovies();
-    } catch (error) {
-      console.error('Failed to load movies:', error);
-      showToast('Failed to load movies', 'danger');
-      document.getElementById('moviesTable').innerHTML = 
-        '<tr><td colspan="8" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle me-2"></i>Failed to load movies</td></tr>';
-    } finally {
-      showLoading('moviesLoading', false);
-    }
-  }
-
-  function renderMovies() {
-    const search = document.getElementById('searchMovies')?.value.toLowerCase() || '';
-    const statusFilter = document.getElementById('filterStatus')?.value || 'all';
-    
-    let filteredMovies = [...movies];
-
-    if (statusFilter !== 'all') {
-      filteredMovies = filteredMovies.filter(m => m.status === statusFilter);
-    }
-    
-    if (search) {
-      filteredMovies = filteredMovies.filter(m => 
-        m.title.toLowerCase().includes(search) || 
-        (m.reviewer && m.reviewer.toLowerCase().includes(search)) ||
-        (m.genre && m.genre.toLowerCase().includes(search))
+    // Apply search filter
+    if (query) {
+      const searchTerm = query.toLowerCase();
+      results = results.filter(r => 
+        r.title.toLowerCase().includes(searchTerm) ||
+        r.reviewer.toLowerCase().includes(searchTerm) ||
+        r.genre.toLowerCase().includes(searchTerm) ||
+        r.tags.some(tag => tag.toLowerCase().includes(searchTerm)) ||
+        r.summary.toLowerCase().includes(searchTerm)
       );
     }
-
-    const tbody = document.getElementById('moviesTable');
     
-    if (filteredMovies.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4"><i class="fas fa-search me-2"></i>No movies found matching your criteria</td></tr>';
+    // Apply genre filter
+    if (genre) {
+      results = results.filter(r => r.genre === genre);
+    }
+    
+    // Apply sorting
+    switch (sortBy) {
+      case 'rating-desc':
+        results.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'rating-asc':
+        results.sort((a, b) => a.rating - b.rating);
+        break;
+      case 'year-desc':
+        results.sort((a, b) => b.year - a.year);
+        break;
+      case 'year-asc':
+        results.sort((a, b) => a.year - b.year);
+        break;
+      case 'title-asc':
+        results.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case 'views-desc':
+        results.sort((a, b) => b.views - a.views);
+        break;
+      default:
+        results.sort((a, b) => b.rating - a.rating);
+    }
+    
+    return results;
+  }
+
+  getGenres() {
+    return this.genres;
+  }
+
+  getStats() {
+    const published = this.reviews.filter(r => r.status === 'published');
+    return {
+      totalReviews: published.length,
+      averageRating: (published.reduce((sum, r) => sum + r.rating, 0) / published.length).toFixed(1),
+      totalViews: published.reduce((sum, r) => sum + r.views, 0)
+    };
+  }
+}
+
+// =================================
+// FRONTEND APPLICATION
+// =================================
+
+class CineReviewApp {
+  constructor() {
+    this.cms = new HeadlessCMS();
+    this.currentPage = 'home';
+    this.reviewsPerPage = 8;
+    this.currentReviews = [];
+    this.displayedReviews = [];
+    this.currentFilters = {
+      search: '',
+      genre: '',
+      sort: 'rating-desc'
+    };
+    
+    this.init();
+  }
+
+  async init() {
+    this.setupEventListeners();
+    this.updateApiStatus('connected');
+    await this.loadHomePage();
+  }
+
+  setupEventListeners() {
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const genreFilter = document.getElementById('genreFilter');
+    const sortBy = document.getElementById('sortBy');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+    searchInput.addEventListener('input', this.debounce(() => {
+      this.currentFilters.search = searchInput.value.trim();
+      this.searchAndRender();
+    }, 300));
+
+    genreFilter.addEventListener('change', () => {
+      this.currentFilters.genre = genreFilter.value;
+      this.searchAndRender();
+    });
+
+    sortBy.addEventListener('change', () => {
+      this.currentFilters.sort = sortBy.value;
+      this.searchAndRender();
+    });
+
+    loadMoreBtn.addEventListener('click', () => {
+      this.loadMoreReviews();
+    });
+  }
+
+  async loadHomePage() {
+    try {
+      this.updateApiStatus('loading');
+      
+      // Load genres for filter
+      const genres = this.cms.getGenres();
+      this.populateGenreFilter(genres);
+      
+      // Load initial reviews
+      await this.searchAndRender();
+      
+      // Update hero stats
+      this.updateHeroStats();
+      
+      this.updateApiStatus('connected');
+    } catch (error) {
+      console.error('Failed to load home page:', error);
+      this.updateApiStatus('error');
+      this.showError('Failed to load reviews. Please try again later.');
+    }
+  }
+
+  async searchAndRender() {
+    try {
+      this.showLoading();
+      
+      const { search, genre, sort } = this.currentFilters;
+      this.currentReviews = await this.cms.searchReviews(search, genre, sort);
+      this.displayedReviews = this.currentReviews.slice(0, this.reviewsPerPage);
+      
+      this.renderReviews();
+      this.updateLoadMoreButton();
+      
+    } catch (error) {
+      console.error('Search failed:', error);
+      this.showError('Search failed. Please try again.');
+    }
+  }
+
+  populateGenreFilter(genres) {
+    const genreFilter = document.getElementById('genreFilter');
+    genreFilter.innerHTML = '<option value="">All Genres</option>' + 
+      genres.map(genre => `<option value="${genre}">${genre}</option>`).join('');
+  }
+
+  renderReviews() {
+    const container = document.getElementById('reviewsContainer');
+    
+    if (this.displayedReviews.length === 0) {
+      container.innerHTML = `
+        <div class="text-center py-5 fade-in">
+          <i class="fas fa-search fa-3x text-muted mb-3"></i>
+          <h4 class="text-muted">No reviews found</h4>
+          <p class="text-muted">Try adjusting your search criteria</p>
+        </div>
+      `;
       return;
     }
 
-    tbody.innerHTML = filteredMovies.map(movie => `
-      <tr>
-        <td>
-          <img src="${escapeHtml(movie.posterUrl || '')}" 
-               alt="${escapeHtml(movie.title)}" 
-               style="width:50px;height:75px;object-fit:cover;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);" 
-               onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNzUiIHZpZXdCb3g9IjAgMCA1MCA3NSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9Ijc1IiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0yNSAzN0MyOC4zMTM3IDM3IDMxIDM0LjMxMzcgMzEgMzFDMzEgMjcuNjg2MyAyOC4zMTM3IDI1IDI1IDI1QzIxLjY4NjMgMjUgMTkgMjcuNjg2MyAxOSAzMUMxOSAzNC4zMTM3IDIxLjY4NjMgMzcgMjUgMzdaIiBmaWxsPSIjOUM5Qzk4Ii8+CjxwYXRoIGQ9Ik0zNSA0NUgyNUMxOS40NzcyIDQ1IDE1IDQ5LjQ3NzIgMTUgNTVWNTdIMzVWNDVaIiBmaWxsPSIjOUM5Qzk4Ii8+Cjwvc3ZnPgo='" />
-        </td>
-        <td>
-          <div class="fw-bold">${escapeHtml(movie.title)}</div>
-          <small class="text-muted">by ${escapeHtml(movie.reviewer)}</small>
-        </td>
-        <td><span class="badge bg-secondary">${escapeHtml(movie.genre)}</span></td>
-        <td>
-          <div class="d-flex align-items-center">
-            <i class="fas fa-star text-warning me-1"></i>
-            <span class="fw-bold">${movie.rating}/10</span>
+    const reviewsHTML = this.displayedReviews.map(review => `
+      <div class="col-lg-3 col-md-4 col-sm-6 mb-4 fade-in">
+        <div class="review-card" onclick="app.showReviewDetail(${review.id})">
+          <div class="position-relative">
+            <img src="${review.posterUrl}" alt="${this.escapeHtml(review.title)}" 
+                 class="poster" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQ1MCIgdmlld0JveD0iMCAwIDMwMCA0NTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIzMDAiIGhlaWdodD0iNDUwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNTAgMjI1QzE2Ni41NjkgMjI1IDE4MCAyMTEuNTY5IDE4MCAxOTVDMTgwIDE3OC40MzEgMTY2LjU2OSAxNjUgMTUwIDE2NUMxMzMuNDMxIDE2NSAxMjAgMTc4LjQzMSAxMjAgMTk1QzEyMCAyMTEuNTY5IDEzMy40MzEgMjI1IDE1MCAyMjVaIiBmaWxsPSIjOUM5Qzk4Ii8+CjxwYXRoIGQ9Ik0yMTAgMjcwSDE1MEM5MS4zNDAyIDI3MCA0NSAzMTYuMzQgNDUgMzc1VjM5MEgyMTBWMjcwWiIgZmlsbD0iIzlDOUM5OCIvPgo8L3N2Zz4K'" />
+            <div class="rating-badge">
+              <i class="fas fa-star me-1"></i>${review.rating}
+            </div>
           </div>
-        </td>
-        <td>${movie.year || 'N/A'}</td>
-        <td><span class="badge bg-${movie.status === 'published' ? 'success' : 'warning'}">${escapeHtml(movie.status)}</span></td>
-        <td>
-          <div class="d-flex align-items-center">
-            <i class="fas fa-eye text-muted me-1"></i>
-            ${formatNumber(movie.views)}
+          <div class="card-body">
+            <h5 class="card-title fw-bold mb-2">${this.escapeHtml(review.title)}</h5>
+            <p class="text-muted mb-2">
+              <i class="fas fa-user me-1"></i>by ${this.escapeHtml(review.reviewer)}
+            </p>
+            <span class="genre-badge me-2">${this.escapeHtml(review.genre)}</span>
+            <small class="text-muted">${review.year}</small>
+            <p class="card-text mt-3">${this.escapeHtml(review.summary)}</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <small class="text-muted">
+                <i class="fas fa-eye me-1"></i>${this.formatNumber(review.views)} views
+              </small>
+              <small class="text-muted">
+                <i class="fas fa-heart me-1"></i>${this.formatNumber(review.likes)}
+              </small>
+            </div>
           </div>
-        </td>
-        <td>
-          <div class="btn-group btn-group-sm" role="group">
-            <button class="btn btn-outline-primary" title="Edit" onclick="editMovie(${movie.id})">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button class="btn btn-outline-danger" title="Delete" onclick="deleteMovie(${movie.id})">
-              <i class="fas fa-trash"></i>
-            </button>
-            <button class="btn btn-outline-secondary" title="Toggle Status" onclick="toggleMovieStatus(${movie.id})">
-              <i class="fas fa-eye${movie.status === 'published' ? '-slash' : ''}"></i>
-            </button>
-          </div>
-        </td>
-      </tr>
+        </div>
+      </div>
     `).join('');
+
+    container.innerHTML = `<div class="row">${reviewsHTML}</div>`;
   }
 
-  // Movie CRUD Functions
-  window.editMovie = async function(id) {
+  async showReviewDetail(reviewId) {
     try {
-      setLoadingButton('saveMovieBtn', true);
-      const movie = movies.find(m => m.id === id) || await api.getMovie(id);
+      this.updateApiStatus('loading');
+      const review = await this.cms.getReviewById(reviewId);
       
-      currentMovieId = id;
-      document.getElementById('movieFormTitle').textContent = 'Edit Movie';
+      document.getElementById('homePage').style.display = 'none';
+      document.getElementById('adminPanelPage').style.display = 'none';
+      document.getElementById('reviewDetailPage').style.display = 'block';
       
-      // Populate form
-      ['title', 'reviewer', 'genre', 'rating', 'year', 'status'].forEach(field => {
-        const element = document.getElementById(field);
-        if (element) element.value = movie[field] || '';
-      });
-      
-      document.getElementById('posterUrl').value = movie.posterUrl || '';
-      updatePosterPreview(movie.posterUrl);
-      
-      showPage('add-movie');
-    } catch (error) {
-      console.error('Failed to load movie for editing:', error);
-      showToast('Failed to load movie details', 'danger');
-    } finally {
-      setLoadingButton('saveMovieBtn', false);
-    }
-  };
-
-  window.deleteMovie = async function(id) {
-    const movie = movies.find(m => m.id === id);
-    if (!movie) return;
-    
-    if (!confirm(`Are you sure you want to delete "${movie.title}"?`)) return;
-    
-    try {
-      await api.deleteMovie(id);
-      movies = movies.filter(m => m.id !== id);
-      showToast('Movie deleted successfully', 'success');
-      renderMovies();
-    } catch (error) {
-      console.error('Failed to delete movie:', error);
-      showToast('Failed to delete movie', 'danger');
-    }
-  };
-
-  window.toggleMovieStatus = async function(id) {
-    const movie = movies.find(m => m.id === id);
-    if (!movie) return;
-    
-    const newStatus = movie.status === 'published' ? 'draft' : 'published';
-    const updatedMovie = { ...movie, status: newStatus };
-    
-    try {
-      await api.updateMovie(id, updatedMovie);
-      movie.status = newStatus;
-      if (newStatus === 'published') {
-        movie.publishedAt = new Date().toISOString();
-      } else {
-        movie.publishedAt = null;
-        movie.views = 0;
-      }
-      showToast(`Movie ${newStatus === 'published' ? 'published' : 'unpublished'} successfully`, 'success');
-      renderMovies();
-      // Refresh dashboard if currently viewing it
-      if (document.getElementById('dashboard-page').classList.contains('active')) {
-        loadDashboard();
-      }
-    } catch (error) {
-      console.error('Failed to update movie status:', error);
-      showToast('Failed to update movie status', 'danger');
-    }
-  };
-
-  window.refreshMovies = function() {
-    loadMovies();
-  };
-
-  // Movie Form Functions
-  function resetMovieForm() {
-    currentMovieId = null;
-    document.getElementById('movieFormTitle').textContent = 'Add New Movie';
-    document.getElementById('movieForm').reset();
-    document.getElementById('movieForm').classList.remove('was-validated');
-    updatePosterPreview('');
-  }
-
-  function updatePosterPreview(url) {
-    const preview = document.getElementById('posterPreview');
-    const placeholder = document.getElementById('posterPlaceholder');
-    
-    if (url && isValidUrl(url)) {
-      preview.src = url;
-      preview.style.display = 'block';
-      placeholder.style.display = 'none';
-    } else {
-      preview.style.display = 'none';
-      placeholder.style.display = 'block';
-    }
-  }
-
-  function isValidUrl(string) {
-    try {
-      new URL(string);
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  // Settings Functions
-  function loadSettingsForm() {
-    const currentSettings = loadSettings();
-    document.getElementById('adminEmail').value = currentSettings.adminEmail || '';
-    document.getElementById('siteTitle').value = currentSettings.siteTitle || '';
-    document.getElementById('apiEndpoint').value = currentSettings.apiEndpoint || '';
-    testApiConnection();
-  }
-
-  window.testApiConnection = async function() {
-    const statusDiv = document.getElementById('apiStatus');
-    statusDiv.innerHTML = '<span class="loading-spinner me-2"></span>Testing connection...';
-    
-    try {
-      const result = await api.testConnection();
-      statusDiv.innerHTML = `
-        <div class="alert alert-${result.status === 'connected' ? 'success' : 'danger'} mb-0">
-          <i class="fas fa-${result.status === 'connected' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
-          ${result.message}
+      const content = document.getElementById('reviewDetailContent');
+      content.innerHTML = `
+        <div class="row">
+          <div class="col-lg-4">
+            <img src="${review.posterUrl}" alt="${this.escapeHtml(review.title)}" 
+                 class="img-fluid rounded shadow-lg mb-4" 
+                 style="width: 100%; max-width: 400px;" />
+            
+            <div class="text-center">
+              <div class="d-flex justify-content-center align-items-center mb-3">
+                <div class="rating-display bg-warning text-dark p-3 rounded-circle me-3">
+                  <i class="fas fa-star"></i>
+                  <strong>${review.rating}/10</strong>
+                </div>
+                <div>
+                  <h6 class="mb-0">Critics Rating</h6>
+                  <small class="text-muted">Out of 10</small>
+                </div>
+              </div>
+              
+              <div class="stats-section">
+                <div class="row text-center">
+                  <div class="col-6">
+                    <h6><i class="fas fa-eye text-primary me-1"></i>${this.formatNumber(review.views)}</h6>
+                    <small class="text-muted">Views</small>
+                  </div>
+                  <div class="col-6">
+                    <h6><i class="fas fa-heart text-danger me-1"></i>${this.formatNumber(review.likes)}</h6>
+                    <small class="text-muted">Likes</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-lg-8">
+            <div class="p-4">
+              <div class="mb-4">
+                <h1 class="display-5 fw-bold mb-3">${this.escapeHtml(review.title)}</h1>
+                <div class="d-flex flex-wrap align-items-center mb-3">
+                  <span class="genre-badge me-3">${this.escapeHtml(review.genre)}</span>
+                  <span class="badge bg-secondary me-3">${review.year}</span>
+                  <span class="text-muted">
+                    <i class="fas fa-user me-1"></i>Reviewed by ${this.escapeHtml(review.reviewer)}
+                  </span>
+                </div>
+                <div class="tags mb-4">
+                  ${review.tags.map(tag => `
+                    <span class="badge bg-light text-dark me-1 mb-1">#${tag}</span>
+                  `).join('')}
+                </div>
+              </div>
+              
+              <div class="review-content">
+                <h4 class="mb-3">Review Summary</h4>
+                <p class="lead text-muted mb-4">${this.escapeHtml(review.summary)}</p>
+                
+                <h4 class="mb-3">Full Review</h4>
+                <div class="review-text">
+                  ${review.fullReview.split('\n\n').map(paragraph => 
+                    `<p class="mb-3">${this.escapeHtml(paragraph)}</p>`
+                  ).join('')}
+                </div>
+                
+                <hr class="my-4">
+                
+                <div class="reviewer-info bg-light p-3 rounded">
+                  <h6><i class="fas fa-pen me-2"></i>About the Reviewer</h6>
+                  <p class="mb-0 text-muted">
+                    <strong>${this.escapeHtml(review.reviewer)}</strong> - 
+                    Published on ${this.formatDate(review.publishedAt)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       `;
+      
+      this.updateApiStatus('connected');
+      this.currentPage = 'detail';
+      
     } catch (error) {
-      statusDiv.innerHTML = `
-        <div class="alert alert-danger mb-0">
-          <i class="fas fa-exclamation-triangle me-2"></i>
-          Connection failed: ${error.message}
-        </div>
+      console.error('Failed to load review details:', error);
+      this.updateApiStatus('error');
+      this.showError('Failed to load review details.');
+    }
+  }
+
+  loadMoreReviews() {
+    const nextBatch = this.currentReviews.slice(
+      this.displayedReviews.length, 
+      this.displayedReviews.length + this.reviewsPerPage
+    );
+    
+    this.displayedReviews = [...this.displayedReviews, ...nextBatch];
+    this.renderReviews();
+    this.updateLoadMoreButton();
+  }
+
+  updateLoadMoreButton() {
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const hasMore = this.displayedReviews.length < this.currentReviews.length;
+    loadMoreBtn.style.display = hasMore ? 'block' : 'none';
+    
+    if (hasMore) {
+      const remaining = this.currentReviews.length - this.displayedReviews.length;
+      loadMoreBtn.innerHTML = `
+        <i class="fas fa-plus me-2"></i>
+        Load More Reviews (${remaining} remaining)
       `;
     }
-  };
+  }
 
-  // Event Listeners
-  document.addEventListener('DOMContentLoaded', function() {
-    // Load saved settings and token
-    loadSettings();
-    const hasToken = loadToken();
-    
-    if (hasToken) {
-      document.getElementById('currentUser').textContent = authToken.user?.name || 'Admin';
-      showPage('dashboard');
-    } else {
-      bootstrap.Modal.getOrCreateInstance(document.getElementById('loginModal')).show();
+  async updateHeroStats() {
+    try {
+      const stats = this.cms.getStats();
+      document.getElementById('heroTotalReviews').textContent = stats.totalReviews + '+';
+      document.getElementById('heroAvgRating').textContent = stats.averageRating;
+      document.getElementById('heroTotalViews').textContent = this.formatNumber(stats.totalViews, true);
+    } catch (error) {
+      console.error('Failed to update hero stats:', error);
     }
+  }
 
-    // Sidebar navigation
-    document.querySelectorAll('#sidebar .nav-link[data-page]').forEach(link => {
-      link.addEventListener('click', e => {
-        e.preventDefault();
-        const page = e.currentTarget.dataset.page;
-        showPage(page);
-      });
-    });
+  showLoading() {
+    document.getElementById('reviewsContainer').innerHTML = `
+      <div class="text-center py-5">
+        <div class="loading-spinner mb-3" style="width: 40px; height: 40px;"></div>
+        <p class="text-muted">Loading movie reviews...</p>
+      </div>
+    `;
+  }
 
-    // Search and filter for movies
-    document.getElementById('searchMovies').addEventListener('input', debounce(renderMovies, 300));
-    document.getElementById('filterStatus').addEventListener('change', renderMovies);
+  showError(message) {
+    document.getElementById('reviewsContainer').innerHTML = `
+      <div class="text-center py-5">
+        <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+        <h4 class="text-danger">${this.escapeHtml(message)}</h4>
+        <button class="btn btn-primary mt-3" onclick="app.loadHomePage()">
+          <i class="fas fa-refresh me-2"></i>Try Again
+        </button>
+      </div>
+    `;
+  }
 
-    // Poster URL preview
-    document.getElementById('posterUrl').addEventListener('input', function() {
-      updatePosterPreview(this.value.trim());
-    });
+  showHomePage() {
+    document.getElementById('reviewDetailPage').style.display = 'none';
+    document.getElementById('adminPanelPage').style.display = 'none';
+    document.getElementById('homePage').style.display = 'block';
+    this.currentPage = 'home';
+    
+    if (this.currentReviews.length === 0) {
+      this.loadHomePage();
+    }
+  }
 
-    // Movie form submission
-    document.getElementById('movieForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      if (!this.checkValidity()) {
-        this.classList.add('was-validated');
-        return;
-      }
+  showAdminPanel() {
+    document.getElementById('homePage').style.display = 'none';
+    document.getElementById('reviewDetailPage').style.display = 'none';
+    document.getElementById('adminPanelPage').style.display = 'block';
+    this.currentPage = 'admin';
+    
+    // Load the admin panel content (your original admin panel code)
+    this.loadAdminPanelContent();
+  }
 
-      setLoadingButton('saveMovieBtn', true);
+  loadAdminPanelContent() {
+    const adminContent = document.getElementById('adminPanelContent');
+    adminContent.innerHTML = `
+      <div style="transform: scale(0.9); transform-origin: top left; width: 111%; height: 111%;">
+        <iframe src="data:text/html;charset=utf-8,${encodeURIComponent(this.getAdminPanelHTML())}" 
+                style="width: 100%; height: 80vh; border: none;">
+        </iframe>
+      </div>
+    `;
+  }
 
-      try {
-        const formData = new FormData(this);
-        const movieData = {
-          title: formData.get('title').trim(),
-          reviewer: formData.get('reviewer').trim(),
-          genre: formData.get('genre').trim(),
-          rating: parseFloat(formData.get('rating')),
-          year: parseInt(formData.get('year'), 10),
-          status: formData.get('status'),
-          posterUrl: formData.get('poster').trim(),
-          views: 0,
-          likes: 0,
-          createdAt: Date.now(),
-          publishedAt: formData.get('status') === 'published' ? new Date().toISOString() : null
-        };
+  getAdminPanelHTML() {
+    // Return your original admin panel HTML
+    return document.querySelector('html').outerHTML;
+  }
 
-        let savedMovie;
-        if (currentMovieId) {
-          savedMovie = await api.updateMovie(currentMovieId, movieData);
-          const index = movies.findIndex(m => m.id === currentMovieId);
-          if (index !== -1) movies[index] = savedMovie;
-          showToast('Movie updated successfully', 'success');
-        } else {
-          savedMovie = await api.createMovie(movieData);
-          movies.push(savedMovie);
-          showToast('Movie added successfully', 'success');
-        }
-
-        resetMovieForm();
-        showPage('movies');
-        
-      } catch (error) {
-        console.error('Failed to save movie:', error);
-        showToast('Failed to save movie', 'danger');
-      } finally {
-        setLoadingButton('saveMovieBtn', false);
-      }
-    });
-
-    // Cancel movie form
-    document.getElementById('cancelMovieBtn').addEventListener('click', () => {
-      resetMovieForm();
-      showPage('movies');
-    });
-
-    // Settings form submission
-    document.getElementById('settingsForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      if (!this.checkValidity()) {
-        this.classList.add('was-validated');
-        return;
-      }
-
-      const formData = new FormData(this);
-      const newSettings = {
-        adminEmail: formData.get('adminEmail').trim(),
-        siteTitle: formData.get('siteTitle').trim(),
-        apiEndpoint: formData.get('apiEndpoint').trim()
-      };
-
-      saveSettings(newSettings);
-      showToast('Settings saved successfully', 'success');
-    });
-
-    // Login form submission
-    document.getElementById('loginForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      if (!this.checkValidity()) {
-        this.classList.add('was-validated');
-        return;
-      }
-
-      setLoadingButton('loginBtn', true);
-
-      try {
-        const formData = new FormData(this);
-        const credentials = {
-          email: formData.get('loginEmail') || document.getElementById('loginEmail').value.trim(),
-          password: formData.get('loginPassword') || document.getElementById('loginPassword').value.trim()
-        };
-
-        const response = await api.login(credentials);
-        saveToken(response);
-        document.getElementById('currentUser').textContent = response.user?.name || 'Admin';
-        
-        bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
-        showToast('Login successful!', 'success');
-        showPage('dashboard');
-        
-      } catch (error) {
-        console.error('Login failed:', error);
-        showToast('Login failed. Please try again.', 'danger');
-      } finally {
-        setLoadingButton('loginBtn', false);
-      }
-    });
-
-    // Logout
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      window.cineAuthToken = null;
-      authToken = null;
-      movies = [];
-      bootstrap.Modal.getOrCreateInstance(document.getElementById('loginModal')).show();
-      showToast('Logged out successfully', 'info');
-    });
-
-    // Bootstrap form validation
-    document.querySelectorAll('.needs-validation').forEach(form => {
-      form.addEventListener('submit', event => {
-        if (!form.checkValidity()) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
-        form.classList.add('was-validated');
-      }, false);
-    });
-  });
+  updateApiStatus(status) {
+    const indicator = document.getElementById('apiIndicator');
+    const statusText = document.getElementById('apiStatus');
+    
+    indicator.className = `api-indicator ${status}`;
+    
+    switch (status) {
+      case 'connected':
+        statusText.innerHTML = '<i class="fas fa-circle me-2"></i>API Connected';
+        break;
+      case 'loading':
+        statusText.innerHTML = '<span class="loading-spinner me-2" style="width: 12px; height: 12px;"></span>Loading...';
+        break;
+      case 'error':
+        statusText.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>API Error';
+        break;
+      default:
+        statusText.innerHTML = '<i class="fas fa-circle me-2"></i>Connecting...';
+    }
+  }
 
   // Utility Functions
-  function debounce(func, wait) {
+  debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
       const later = () => {
@@ -1390,10 +1377,110 @@
     };
   }
 
-  // Initialize connection status
-  updateConnectionStatus(false);
+  escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
 
-})();
+  formatNumber(num, abbreviated = false) {
+    if (!num) return '0';
+    
+    if (abbreviated && num >= 1000) {
+      if (num >= 1000000) {
+        return (num / 1000000).toFixed(1) + 'M';
+      }
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    
+    return new Intl.NumberFormat().format(num);
+  }
+
+  formatDate(dateStr) {
+    if (!dateStr) return 'Unknown';
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }).format(new Date(dateStr));
+  }
+}
+
+// =================================
+// APPLICATION INITIALIZATION
+// =================================
+
+let app;
+
+document.addEventListener('DOMContentLoaded', function() {
+  app = new CineReviewApp();
+});
+
+// Global navigation functions
+function showHomePage() {
+  app.showHomePage();
+}
+
+function showAdminPanel() {
+  app.showAdminPanel();
+}
+
+// =================================
+// DEMO API ENDPOINTS (For Testing)
+// =================================
+
+// Simulate REST API endpoints that a real backend would provide
+window.CineReviewAPI = {
+  // GET /api/reviews
+  async getReviews(limit = 20, offset = 0) {
+    const reviews = await app.cms.getAllReviews();
+    return {
+      data: reviews.slice(offset, offset + limit),
+      total: reviews.length,
+      limit,
+      offset
+    };
+  },
+
+  // GET /api/reviews/:id
+  async getReview(id) {
+    return await app.cms.getReviewById(id);
+  },
+
+  // GET /api/reviews/search
+  async searchReviews(params = {}) {
+    const { q = '', genre = '', sort = 'rating-desc', limit = 20, offset = 0 } = params;
+    const results = await app.cms.searchReviews(q, genre, sort);
+    return {
+      data: results.slice(offset, offset + limit),
+      total: results.length,
+      query: q,
+      filters: { genre, sort },
+      limit,
+      offset
+    };
+  },
+
+  // GET /api/genres
+  async getGenres() {
+    return app.cms.getGenres();
+  },
+
+  // GET /api/stats
+  async getStats() {
+    return app.cms.getStats();
+  }
+};
+
+// Make API available globally for testing
+console.log('CineReview API Demo Endpoints:');
+console.log('- CineReviewAPI.getReviews()');
+console.log('- CineReviewAPI.getReview(id)');
+console.log('- CineReviewAPI.searchReviews({q, genre, sort})');
+console.log('- CineReviewAPI.getGenres()');
+console.log('- CineReviewAPI.getStats()');
+
 </script>
 </body>
 </html>
